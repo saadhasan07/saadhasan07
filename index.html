@@ -5,134 +5,346 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saad Hasan - DevOps & Cloud Computing Specialist</title>
     <meta name="description" content="DevOps & Cloud Computing Specialist passionate about automating infrastructure and implementing CI/CD pipelines.">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@12/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            line-height: 1.6; 
-            color: #333; 
-            background: #f9fafb;
-        }
-        .hero {
+        body { font-family: 'Inter', sans-serif; }
+        .academic-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 80px 20px;
-            text-align: center;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .avatar {
-            width: 128px;
-            height: 128px;
-            border-radius: 50%;
-            margin: 0 auto 30px;
-            border: 4px solid white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
-        h1 { font-size: 3.5rem; font-weight: 700; margin-bottom: 10px; }
-        .cta {
-            display: inline-block;
-            padding: 12px 24px;
-            margin: 10px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
+        .zen-green {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
         }
-        .cta:hover { background: #0056b3; }
-        .section {
-            padding: 80px 20px;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        .tag {
-            display: inline-block;
-            padding: 4px 12px;
-            margin: 4px;
-            background: #e5e7eb;
-            color: #374151;
-            border-radius: 20px;
-            font-size: 0.9rem;
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
     </style>
+    
+    <script>
+        // Configure Tailwind
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <div class="hero">
-        <div class="container">
-            <img src="https://avatars.githubusercontent.com/u/136428421?v=4" alt="Saad Hasan" class="avatar">
-            <h1>Saad Hasan</h1>
-            <h2>DevOps & Cloud Computing Specialist</h2>
-            <p style="font-size: 1.2rem; margin: 20px 0; opacity: 0.9;">
-                Passionate about automating infrastructure, implementing CI/CD pipelines, and leveraging cloud technologies to build scalable, reliable systems.
-            </p>
-            <a href="https://github.com/saadhasan07" class="cta">GitHub</a>
-            <a href="https://linkedin.com/in/saad-hasan" class="cta">LinkedIn</a>
-        </div>
-    </div>
+<body class="bg-gray-50">
+    <div id="root"></div>
 
-    <div class="section">
-        <div class="container">
-            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 50px;">Featured Project</h2>
-            <div class="card">
-                <h3 style="font-size: 1.5rem; margin-bottom: 15px;">Hashify</h3>
-                <p style="margin-bottom: 20px;">
-                    A modern hash generation and verification tool built with React and Node.js. Features multiple hashing algorithms and secure verification capabilities.
-                </p>
-                <span class="tag">React</span>
-                <span class="tag">Node.js</span>
-                <span class="tag">Express</span>
-                <span class="tag">Crypto</span>
-                <br><br>
-                <a href="https://github.com/saadhasan07/hashify" style="color: #007bff; font-weight: 500;">View on GitHub →</a>
-            </div>
-        </div>
-    </div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-    <div class="section" style="background: #f3f4f6;">
-        <div class="container">
-            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 50px;">Experience</h2>
-            <div class="card">
-                <h3 style="font-size: 1.5rem; margin-bottom: 10px;">DevOps and Cloud Computing Certification</h3>
-                <p style="color: #007bff; font-weight: 500;">Techstarter • Hamburg, Germany</p>
-                <p style="color: #666; margin-bottom: 20px;">2023 - Present</p>
-                <p style="margin-bottom: 20px;">
-                    Comprehensive training in modern DevOps practices, cloud architecture, and automation technologies. Focus on AWS services, containerization, and CI/CD implementation.
-                </p>
-                <span class="tag">AWS</span>
-                <span class="tag">Docker</span>
-                <span class="tag">Kubernetes</span>
-                <span class="tag">Terraform</span>
-                <span class="tag">CI/CD</span>
-                <span class="tag">Linux</span>
-            </div>
-        </div>
-    </div>
+        // Portfolio data with your actual information
+        const portfolioData = {
+            profile: {
+                name: "Saad Hasan",
+                title: "DevOps & Cloud Computing Specialist",
+                bio: "Passionate about automating infrastructure, implementing CI/CD pipelines, and leveraging cloud technologies to build scalable, reliable systems.",
+                email: "contact@saadhasan.dev",
+                location: "Hamburg, Germany",
+                avatar: "https://avatars.githubusercontent.com/u/136428421?v=4",
+                github: "https://github.com/saadhasan07",
+                linkedin: "https://linkedin.com/in/saad-hasan",
+                skills: ["Docker", "Kubernetes", "AWS", "CI/CD", "Terraform", "Python", "Node.js", "React", "Linux", "Jenkins"]
+            },
+            projects: [
+                {
+                    id: 1,
+                    title: "Hashify",
+                    description: "A modern hash generation and verification tool built with React and Node.js. Features multiple hashing algorithms, real-time generation, and secure verification capabilities.",
+                    technologies: ["React", "Node.js", "Express", "Crypto", "JWT"],
+                    githubUrl: "https://github.com/saadhasan07/hashify",
+                    liveUrl: "https://hashify-demo.com",
+                    featured: true,
+                    category: "Web Development"
+                },
+                {
+                    id: 2,
+                    title: "DevOps Portfolio Website",
+                    description: "A comprehensive portfolio website showcasing DevOps projects and skills. Built with React, Express, and PostgreSQL, featuring admin dashboard and multilingual support.",
+                    technologies: ["React", "Express", "PostgreSQL", "Tailwind CSS", "Drizzle ORM"],
+                    githubUrl: "https://github.com/saadhasan07/portfolio",
+                    liveUrl: "https://saadhasan07.github.io/saadhasan07/",
+                    featured: true,
+                    category: "Full-Stack Development"
+                },
+                {
+                    id: 3,
+                    title: "Infrastructure Automation",
+                    description: "Automated cloud infrastructure deployment using Terraform and AWS. Includes VPC setup, EC2 instances, RDS databases, and CI/CD pipeline integration.",
+                    technologies: ["Terraform", "AWS", "Docker", "GitHub Actions", "Bash"],
+                    githubUrl: "https://github.com/saadhasan07/infrastructure-automation",
+                    featured: false,
+                    category: "DevOps"
+                }
+            ],
+            experiences: [
+                {
+                    id: 1,
+                    title: "DevOps and Cloud Computing Certification",
+                    company: "Techstarter",
+                    location: "Hamburg, Germany",
+                    startDate: "2023-01-01",
+                    endDate: null,
+                    current: true,
+                    description: "Comprehensive training in modern DevOps practices, cloud architecture, and automation technologies. Focus on AWS services, containerization, CI/CD implementation, and infrastructure as code.",
+                    skills: ["AWS", "Docker", "Kubernetes", "Terraform", "CI/CD", "Linux", "Python", "Ansible"],
+                    type: "education"
+                }
+            ],
+            talks: [
+                {
+                    id: 1,
+                    title: "DevOps Fundamentals and Best Practices",
+                    event: "Tech Meetup Hamburg",
+                    date: "2024-03-15",
+                    description: "Presentation covering essential DevOps principles, tool selection, and implementation strategies for modern software development teams.",
+                    topics: ["DevOps Culture", "Tool Selection", "Automation", "Monitoring", "CI/CD Pipelines"]
+                }
+            ],
+            blogPosts: [
+                {
+                    id: 1,
+                    title: "Implementing CI/CD Pipelines with GitHub Actions",
+                    excerpt: "A comprehensive guide to setting up automated deployment pipelines using GitHub Actions, including testing, security scanning, and multi-environment deployments.",
+                    publishedAt: "2024-01-15",
+                    featured: true,
+                    tags: ["CI/CD", "GitHub Actions", "DevOps", "Automation", "Testing"]
+                }
+            ]
+        };
 
-    <div class="section" style="background: #374151; color: white; text-align: center;">
-        <div class="container">
-            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Get In Touch</h2>
-            <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9;">
-                Let's discuss DevOps, cloud architecture, or collaboration opportunities
-            </p>
-            <a href="mailto:contact@saadhasan.dev" class="cta">Email Me</a>
-            <a href="https://github.com/saadhasan07" class="cta">GitHub</a>
-            <a href="https://linkedin.com/in/saad-hasan" class="cta">LinkedIn</a>
-        </div>
-    </div>
+        // Hero Section Component
+        function HeroSection() {
+            const { profile } = portfolioData;
+            const [darkMode, setDarkMode] = useState(false);
 
-    <footer style="background: #1a202c; color: #94a3b8; text-align: center; padding: 30px 20px;">
-        <p>&copy; 2024 Saad Hasan. All rights reserved.</p>
-    </footer>
+            const toggleTheme = () => {
+                const newDarkMode = !darkMode;
+                setDarkMode(newDarkhode);
+                document.documentElement.classList.toggle('dark', newDarkMode);
+            };
+
+            const downloadCV = () => {
+                alert('CV download functionality would be implemented here with actual file URL');
+            };
+
+            return (
+                <section id="about" className="academic-gradient min-h-screen flex items-center pt-20">
+                    <div className="max-w-6xl mx-auto px-6 py-20">
+                        <div className="flex justify-between items-center mb-12">
+                            <h1 className="text-2xl font-bold text-white">Saad Hasan</h1>
+                            <button onClick={toggleTheme} className="p-2 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors">
+                                {darkMode ? '☀️' : '🔭'}
+                            </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                            <div className="text-white">
+                                <h2 className="text-3rem lg:text-4rem font-bold mb-6">
+                                    {profile.title}
+                                </h2>
+                                <p className="text-lg mb-8 opacity-80 leading-relaxed">
+                                    {profile.bio}
+                                </p>
+                                
+                                <div className="flex flex-wrap gap-4 mb-8">
+                                    <button onClick={downloadCV} className="bg-white text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                                        Download CV
+                                    </button>
+                                    <a href={profile.github} target="_blank" rel="noopener noreferrer" className="bg-transparent border-2 border-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-gray-800 transition-colors">
+                                        GitHub
+                                    </a>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2">
+                                    {profile.skills.slice(0, 6).map(skill => (
+                                        <span key={skill} className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center">
+                                <img src={profile.avatar} alt={profile.name} className="w-80 h-80 rounded-full border-8 border-white shadow-2xl object-cover" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        // Projects Section Component
+        function ProjectsSection() {
+            const { projects } = portfolioData;
+            const [selectedCategory, setSelectedCategory] = useState('all');
+
+            const categories = ['all', 'Web Development', 'DevOps', 'Full-Stack Development'];
+            
+            const filteredProjects = selectedCategory === 'all' 
+                ? projects 
+                : projects.filter(project => project.category === selectedCategory);
+
+            return (
+                <section id="projects" className="py-20 bg-white">
+                    <div className="max-w-6xl mx-auto px-6">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+                                Featured Projects
+                            </h2>
+                            <p className="text-gray-600 text-lg">
+                                Showcase of my latest work and contributions
+                            </p>
+                        </div>
+
+                        <div className="flex justify-center mb-12">
+                            <div className="flex flex-wrap gap-2">
+                                {categories.map(category => (
+                                    <button key={category} onClick={() => setSelectedCategory(category)} className={`px-4 py-2 rounded-full font-medium transition-colors ${
+                                        selectedCategory === category ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    }`}>
+                                        {category === 'all' ? 'All' : category}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredProjects.map(project => (
+                                <div key={project.id} className="card-hover bg-white rounded-lg shadow-lg p-6">
+                                    <h3 className="text-xl font-bold mb-3 text-gray-800">
+                                        {project.title}
+                                    </h3>
+                                    <p className="text-gray-600 mb-4">
+                                        {project.description}
+                                    </p>
+                                    
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        {project.technologies.map(tech => (
+                                            <span key={tech} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                                                {tech}
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-medium">
+                                            GitHub →
+                                        </a>
+                                        {project.liveUrl && (
+                                            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-800 font-medium">
+                                                Live Demo →
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        // Contact Section Component
+        function ContactSection() {
+            const { profile } = portfolioData;
+
+            return (
+                <section id="contact" className="py-20 zen-green">
+                    <div className="max-w-4xl mx-auto px-6 text-center">
+                        <h2 className="text-4xl font-bold text-white mb-4">
+                            Let's Connect
+                        </h2>
+                        <p className="text-white text-lg mb-8 opacity-90">
+                            Ready to discuss DevOps, cloud architecture, or collaboration opportunities?
+                        </p>
+                        
+                        <div className="flex justify-center space-x-6">
+                            <a href={`mailto:${profile.email}`} className="bg-white text-green-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                                Email Me
+                            </a>
+                            <a href={profile.github} target="_blank" rel="noopener noreferrer" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-green-600 transition-colors">
+                                GitHub
+                            </a>
+                            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-green-600 transition-colors">
+                                LinkedIn
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        // Footer Component
+        function Footer() {
+            return (
+                <footer className="bg-gray-900 text-gray-400 py-8">
+                    <div className="max-w-6xl mx-auto px-6 text-center">
+                        <p>&copy; 2024 Saad Hasan. All rights reserved.</p>
+                        <p className="mt-2 text-sm">Built with React • Hosted on GitHub Pages</p>
+                    </div>
+                </footer>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            const [activeSection, setActiveSection] = useState('about');
+
+            const scrollToSection = (sectionId) => {
+                const element = document.getElementById(sectionId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                    setActiveSection(sectionId);
+                }
+            };
+
+            return (
+                <div className="min-h-screen">
+                    <HeroSection />
+                    <ProjectsSection />
+                    <ContactSection />
+                    <Footer />
+                </div>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>
