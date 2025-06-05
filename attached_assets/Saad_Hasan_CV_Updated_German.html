@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saad Hasan - Lebenslauf</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2c5aa0;
+            padding-bottom: 20px;
+        }
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-right: 30px;
+            border: 3px solid #2c5aa0;
+        }
+        .header-info h1 {
+            margin: 0;
+            color: #2c5aa0;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        .contact-info {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        .contact-info a {
+            color: #2c5aa0;
+            text-decoration: none;
+        }
+        .section {
+            margin: 30px 0;
+        }
+        .section h2 {
+            color: #2c5aa0;
+            border-bottom: 2px solid #2c5aa0;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        .experience-item, .project-item {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 3px solid #e0e0e0;
+        }
+        .experience-item h3, .project-item h3 {
+            color: #2c5aa0;
+            margin-bottom: 5px;
+        }
+        .date-range {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 5px;
+        }
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .skill-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 3px solid #2c5aa0;
+        }
+        .certifications {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+        }
+        .languages {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .language-item {
+            background: #e7f3ff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #2c5aa0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAB4AHgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0aiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/Z" alt="Saad Hasan" class="profile-image">
+        <div class="header-info">
+            <h1>Saad Hasan</h1>
+            <div class="contact-info">
+                <div>Oststraße 17, 09212 Limbach-Oberfrohna, Deutschland</div>
+                <div>E-Mail: <a href="mailto:saadhasan07@gmail.com">saadhasan07@gmail.com</a> | Telefon: +4917622359115</div>
+                <div>GitHub: <a href="https://github.com/saadhasan07">github.com/saadhasan07</a> | XING: <a href="https://www.xing.com/profile/Saad_Hasan2/">xing.com/profile/Saad_Hasan2</a></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Über mich</h2>
+        <p>AWS-zertifizierter Cloud Practitioner und DevOps-Fachkraft mit umfassender Ausbildung in Cloud Computing, Containerisierung und CI/CD-Pipelines. Abgeschlossene Expertenausbildung in Cloud- und Webentwicklung bei der Techstarter GmbH (600+ Stunden). Spezialisiert auf Docker, Kubernetes, Terraform, Jenkins, GitHub Actions und Infrastruktur-Automatisierung. Erfahren in Python, JavaScript, React, Node.js und Datenbankmanagement mit solider Grundlage in Linux, Netzwerktechnik und Cybersicherheit.</p>
+    </div>
+
+    <div class="section">
+        <h2>Fähigkeiten</h2>
+        <div class="skills-grid">
+            <div class="skill-item">DevOps-Praktiken | CI/CD-Pipelines</div>
+            <div class="skill-item">Automatisierung</div>
+            <div class="skill-item">AWS Cloud Grundlagen</div>
+            <div class="skill-item">Cloud Computing Konzepte</div>
+            <div class="skill-item">Python Entwicklung</div>
+            <div class="skill-item">JavaScript & TypeScript</div>
+            <div class="skill-item">Full-Stack Webentwicklung</div>
+            <div class="skill-item">Git & GitHub</div>
+            <div class="skill-item">Web-Technologien (HTML, CSS)</div>
+            <div class="skill-item">Infrastruktur-Monitoring</div>
+            <div class="skill-item">Agile und Scrum Methoden</div>
+            <div class="skill-item">Problemlösung & Debugging</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>DevOps und Automatisierungs-Projekte</h2>
+        <p>Entwicklung technischer Projekte zur Demonstration von Expertise in CI/CD, Automatisierung, Full-Stack-Entwicklung und professioneller Dokumentation.</p>
+        
+        <div class="project-item">
+            <h3>CI/CD Pipeline Monitor (TypeScript)</h3>
+            <p>Full-Stack-Anwendung zur Echtzeitüberwachung von CI/CD-Pipeline-Builds und -Deployments.</p>
+            <p><a href="https://github.com/saadhasan07/CICD_Pipeline_Monitor">GitHub</a></p>
+        </div>
+
+        <div class="project-item">
+            <h3>Total Battle Scanner (Python)</h3>
+            <p>Automatisierungstool zum Scannen von Spiel-Ressourcen mit anpassbaren Filtern und Schwellenwerten.</p>
+            <p><a href="https://github.com/saadhasan07/total-battle-scanner">GitHub</a></p>
+        </div>
+
+        <div class="project-item">
+            <h3>Gaming Profile App (JavaScript)</h3>
+            <p>Responsive Web-App zur Verwaltung und Präsentation dynamischer Gaming-Profile.</p>
+            <p><a href="https://github.com/saadhasan07/Gaming-Profile-App">GitHub</a></p>
+        </div>
+
+        <div class="project-item">
+            <h3>Lebenslauf und Portfolio (LaTeX)</h3>
+            <p>Professionelle CV- und Portfolio-Vorlage optimiert für technische Bewerbungen.</p>
+            <p><a href="https://github.com/saadhasan07/Resume-and-Porfolio">GitHub</a></p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Berufserfahrung</h2>
+        <div class="experience-item">
+            <h3>DevOps und Cloud Computing Weiterbildung</h3>
+            <div class="date-range">September 2023 – November 2024 | Techstarter GmbH München</div>
+            <p>Erfolgreich abgeschlossene umfassende DevOps- und Cloud Computing-Weiterbildung. Praktische Erfahrungen mit CI/CD-Pipelines, Containerisierung, Cloud-Infrastruktur und Automatisierung gesammelt. Zertifizierungen in AWS Cloud Practitioner und Scrum Fundamentals während des Programms erworben.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Bildung</h2>
+        <div class="experience-item">
+            <h3>Bachelor of Commerce (B.Com), Notendurchschnitt 1,7</h3>
+            <div class="date-range">März 2012 – Juli 2014 | Dhadabhoy University, Karachi (Pakistan)</div>
+            <p>Spezialisierung: Management und Wirtschaft, Logistik</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Zertifizierungen</h2>
+        <div class="certifications">
+            <div>✓ AWS Certified Cloud Practitioner (Bestanden)</div>
+            <div>✓ Scrum Fundamentals Certified (SFC) (Bestanden)</div>
+            <div>✓ Techstarter GmbH – DevOps und Cloud Computing Weiterbildung (Abgeschlossen November 2024)</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Sprachen</h2>
+        <div class="languages">
+            <div class="language-item">Englisch (Fließend)</div>
+            <div class="language-item">Urdu (Muttersprache)</div>
+            <div class="language-item">Deutsch (B1 Zertifiziert, Mittelstufe)</div>
+        </div>
+    </div>
+</body>
+</html>
