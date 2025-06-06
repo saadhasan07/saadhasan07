@@ -50,7 +50,7 @@ export default function HeroSection() {
             <div className="h-6 bg-muted rounded skeleton mb-4"></div>
             <div className="h-4 bg-muted rounded skeleton mb-6"></div>
             <div className="flex flex-wrap gap-3 justify-center">
-              {.[...Array(8)].map((_, i) => (
+              {[...Array(8)].map((_, i) => (
                 <div key={i} className="h-8 w-16 bg-muted rounded skeleton"></div>
               ))}
             </div>
