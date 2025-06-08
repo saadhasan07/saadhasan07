@@ -17,6 +17,7 @@ export const profiles = pgTable("profiles", {
   xing: text("xing"),
   cvEnglish: text("cv_english"),
   cvGerman: text("cv_german"),
+  skills: text("skills").array(),
 });
 
 export const projects = pgTable("projects", {

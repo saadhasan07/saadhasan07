@@ -1,18 +1,15 @@
+import 'dotenv/config';
 import { defineConfig } from "drizzle-kit";
 
-const config = process.env.DATABASE_URL
-  ? defineConfig({
-      out: "./migrations",
-      schema: "./shared/schema.ts",
-      dialect: "postgresql",
-      dbCredentials: {
-        url: process.env.DATABASE_URL,
-      },
-    })
-  : null;
-
-if (!config) {
+if (!process.env.DATABASE_URL) {
   console.warn("DATABASE_URL is not set. Skipping database configuration...");
+} else {
+  export default defineConfig({
+    out: "./migrations",
+    schema: "./shared/schema.ts",
+    dialect: "postgresql",
+    dbCredentials: {
+      url: process.env.DATABASE_URL,
+    },
+  });
 }
-
-export default config;

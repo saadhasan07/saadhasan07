@@ -1,1 +1,12 @@
-node_modules
+```
+.env
+node_modules/
+dist/
+*.log
+*.tar.gz
+*.zip
+.env.local
+.env.production
+.env.development
+.env.test
+```

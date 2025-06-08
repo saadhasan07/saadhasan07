@@ -55,7 +55,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="fixed top-0 w-full bg-background/95 backdrop-blur-sm border-b border-border z-50 transition-colors duration-300">
+    <nav className="fixed top-0 w-full bg-background-header backdrop-blur-sm border-b border-border z-50 transition-colors duration-300">
       <div className="container-width">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}

@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main>
+      <main className="pt-[65px]">
         <HeroSection />
         <ProjectsSection />
         <ProjectTimeline />
