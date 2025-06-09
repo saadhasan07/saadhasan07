@@ -1,11 +1,11 @@
-# Root Dockerfile for Railway deployment (Drizzle-ready, Linux/CI-safe, no pnpm, supports monorepo)
+# Root Dockerfile for Railway deployment (Drizzle-ready, Linux/CI-safe, no pnpm, supports monorepo, no lockfile)
 FROM node:20-slim AS base
 
 WORKDIR /app
 
-# Clean install to avoid Windows lockfile issues
-COPY package.json package-lock.json ./
-RUN rm -rf node_modules package-lock.json && npm install --omit=optional
+# Copy only package.json (not package-lock.json)
+COPY package.json ./
+RUN npm install --omit=optional
 
 # Copy the rest of the code
 COPY . .
@@ -14,7 +14,7 @@ COPY . .
 RUN cd server && if [ -f "tsconfig.json" ]; then npm run build; fi
 
 # Build the frontend
-RUN cd client && rm -rf node_modules package-lock.json && npm install --omit=optional && npm run build
+RUN cd client && npm install --omit=optional && npm run build
 
 # --- Drizzle migration step ---
 # Railway injects DATABASE_URL at runtime, so run migrations at container startup
