@@ -8,5 +8,8 @@ export default defineConfig({
   dialect: "postgresql", // This is required and now always present
   dbCredentials: {
     url: process.env.DATABASE_URL || "postgresql://placeholder:placeholder@localhost:5432/placeholder",
+    ssl: {
+      rejectUnauthorized: false, // Helps with self-signed certificates
+    }
   },
 });
