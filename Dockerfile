@@ -1,12 +1,11 @@
-# Root Dockerfile for Railway deployment (Drizzle-ready, no pnpm, supports monorepo)
+# Root Dockerfile for Railway deployment (Drizzle-ready, no pnpm, supports monorepo, fixed paths)
 FROM node:20-alpine AS base
 
 WORKDIR /app
 
-# Copy package files and install dependencies for both root and server
+# Install root dependencies
 COPY package.json package-lock.json ./
-COPY server/package.json server/package-lock.json ./server/
-RUN npm install --omit=optional && cd server && npm install --omit=optional
+RUN npm install --omit=optional
 
 # Copy the rest of the code
 COPY . .
@@ -24,19 +23,18 @@ FROM node:20-alpine AS prod
 WORKDIR /app
 
 # Copy built code and node_modules
-COPY --from=base /app/server/node_modules ./server/node_modules
+COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/server/dist ./server/dist
-COPY --from=base /app/server/package.json ./server/
-COPY --from=base /app/server/.env ./server/
+COPY --from=base /app/server/.env ./server/  # Only if you have a .env in server
 COPY --from=base /app/server/drizzle.config.ts ./server/
 COPY --from=base /app/server/migrations ./server/migrations
 COPY --from=base /app/client/dist ./client/dist
-COPY --from=base /app/client/package.json ./client/
 
 # Expose backend port
 EXPOSE 3000
 
-# Start: run Drizzle migrations, then backend, and serve frontend with a static server
+# Install global tools for serving and migrations
 RUN npm install -g serve concurrently drizzle-kit
 
+# Start: run Drizzle migrations, then backend, and serve frontend with a static server
 CMD concurrently "cd server && npx drizzle-kit push:pg && node dist/index.js" "serve -s client/dist -l 8080"
