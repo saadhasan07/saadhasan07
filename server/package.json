@@ -17,9 +17,15 @@
     "ws": "^8.18.0",
     "@neondatabase/serverless": "^1.0.1",
     "drizzle-orm": "^0.39.3",
-    "drizzle-zod": "^0.7.1"
+    "drizzle-zod": "^0.7.1",
+    "express-session": "^1.18.1",
+    "nanoid": "^5.0.6",
+    "vite": "^5.2.10"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "@types/express-session": "^1.17.8",
+    "@types/nanoid": "^3.0.0",
+    "@types/vite": "^4.0.1"
   }
 }
