@@ -1,21 +1,12 @@
 import 'dotenv/config';
 import { defineConfig } from "drizzle-kit";
 
-// Check if DATABASE_URL is set
-if (!process.env.DATABASE_URL) {
-  console.warn("DATABASE_URL is not set. Skipping database configuration...");
-  process.exit(1); // Exit with error code if no database URL
-}
-
+// Always export a configuration with the required dialect field
 export default defineConfig({
   out: "./migrations",
   schema: "./shared/schema.ts",
-  dialect: "postgresql",
+  dialect: "postgresql", // This is required and now always present
   dbCredentials: {
-    url: process.env.DATABASE_URL,
-    // Add SSL configuration to handle certificate issues
-    ssl: {
-      rejectUnauthorized: false, // Helps with self-signed certificates
-    }
+    url: process.env.DATABASE_URL || "postgresql://placeholder:placeholder@localhost:5432/placeholder",
   },
 });
