@@ -1,23 +1,20 @@
-# Use official Node.js LTS image
-FROM node:20-alpine
-
-# Set working directory
+# --- Build Stage ---
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Copy only package.json
 COPY package.json ./
-
-# Install dependencies
-RUN npm install --production
-
-# Copy the rest of the code
+COPY package-lock.json* ./
+RUN npm install
 COPY . .
-
-# Build the project
 RUN npm run build
 
-# Expose port (change if your app uses a different port)
-EXPOSE 3000
-
-# Start the app
+# --- Production Stage ---
+FROM node:20-alpine AS production
+WORKDIR /app
+COPY package.json ./
+RUN npm install --production
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server ./server
+COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/.env* ./
+EXPOSE 5000
 CMD ["npm", "start"]
