@@ -1,10 +1,7 @@
-# Root Dockerfile for Railway deployment (Drizzle-ready, no Prisma, supports monorepo)
+# Root Dockerfile for Railway deployment (Drizzle-ready, no pnpm, supports monorepo)
 FROM node:20-alpine AS base
 
 WORKDIR /app
-
-# Install pnpm globally (if you use pnpm in client, otherwise can be removed)
-RUN npm i -g pnpm
 
 # Copy package files and install dependencies for both root and server
 COPY package.json package-lock.json ./
@@ -40,7 +37,6 @@ COPY --from=base /app/client/package.json ./client/
 EXPOSE 3000
 
 # Start: run Drizzle migrations, then backend, and serve frontend with a static server
-# You may want to use 'concurrently' or a process manager if you want both in one container
 RUN npm install -g serve concurrently drizzle-kit
 
 CMD concurrently "cd server && npx drizzle-kit push:pg && node dist/index.js" "serve -s client/dist -l 8080"
