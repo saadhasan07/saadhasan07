@@ -1,5 +1,5 @@
-# Root Dockerfile for Railway deployment (Drizzle-ready, no pnpm, supports monorepo, fixed paths)
-FROM node:20-alpine AS base
+# Root Dockerfile for Railway deployment (Drizzle-ready, no pnpm, supports monorepo, fixed paths, node:20-slim)
+FROM node:20-slim AS base
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ RUN cd client && npm install --omit=optional && npm run build
 # --- Drizzle migration step ---
 # Railway injects DATABASE_URL at runtime, so run migrations at container startup
 
-FROM node:20-alpine AS prod
+FROM node:20-slim AS prod
 WORKDIR /app
 
 # Copy built code and node_modules
