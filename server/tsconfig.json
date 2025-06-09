@@ -8,10 +8,10 @@
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "skipLibCheck": true,
-    "baseUrl": "./",
+    "baseUrl": "../",
     "paths": {
-      "@shared/*": ["../shared/*"]
+      "@shared/*": ["shared/*"]
     }
   },
-  "include": ["**/*.ts"]
+  "include": ["server/**/*.ts", "shared/**/*.ts"]
 }
