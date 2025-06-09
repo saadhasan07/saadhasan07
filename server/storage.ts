@@ -21,6 +21,11 @@ import {
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
+// Add a logger for database errors
+const logDbError = (method: string, error: any) => {
+  console.error(`Database error in ${method}:`, error);
+};
+
 export interface IStorage {
   // Profile methods
   getProfile(): Promise<Profile | undefined>;
@@ -63,179 +68,320 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  private fallbackStorage: MemStorage;
+  
+  constructor() {
+    this.fallbackStorage = new MemStorage();
+  }
+  
   async getProfile(): Promise<Profile | undefined> {
-    const [profile] = await db.select().from(profiles).limit(1);
-    return profile || undefined;
+    try {
+      const [profile] = await db.select().from(profiles).limit(1);
+      return profile || undefined;
+    } catch (error) {
+      logDbError("getProfile", error);
+      return this.fallbackStorage.getProfile();
+    }
   }
 
   async updateProfile(insertProfile: InsertProfile): Promise<Profile> {
-    const existingProfile = await this.getProfile();
-    
-    if (existingProfile) {
-      const [updated] = await db
-        .update(profiles)
-        .set(insertProfile)
-        .where(eq(profiles.id, existingProfile.id))
-        .returning();
-      return updated;
-    } else {
-      const [created] = await db
-        .insert(profiles)
-        .values(insertProfile)
-        .returning();
-      return created;
+    try {
+      const existingProfile = await this.getProfile();
+      
+      if (existingProfile) {
+        const [updated] = await db
+          .update(profiles)
+          .set(insertProfile)
+          .where(eq(profiles.id, existingProfile.id))
+          .returning();
+        return updated;
+      } else {
+        const [created] = await db
+          .insert(profiles)
+          .values(insertProfile)
+          .returning();
+        return created;
+      }
+    } catch (error) {
+      logDbError("updateProfile", error);
+      return this.fallbackStorage.updateProfile(insertProfile);
     }
   }
 
   async getAllProjects(): Promise<Project[]> {
-    return await db.select().from(projects).orderBy(projects.order);
+    try {
+      return await db.select().from(projects).orderBy(projects.order);
+    } catch (error) {
+      logDbError("getAllProjects", error);
+      return this.fallbackStorage.getAllProjects();
+    }
   }
 
   async getFeaturedProjects(): Promise<Project[]> {
-    return await db.select().from(projects).where(eq(projects.featured, true)).orderBy(projects.order);
+    try {
+      return await db.select().from(projects).where(eq(projects.featured, true)).orderBy(projects.order);
+    } catch (error) {
+      logDbError("getFeaturedProjects", error);
+      return this.fallbackStorage.getFeaturedProjects();
+    }
   }
 
   async getProject(id: number): Promise<Project | undefined> {
-    const [project] = await db.select().from(projects).where(eq(projects.id, id));
-    return project || undefined;
+    try {
+      const [project] = await db.select().from(projects).where(eq(projects.id, id));
+      return project || undefined;
+    } catch (error) {
+      logDbError("getProject", error);
+      return this.fallbackStorage.getProject(id);
+    }
   }
 
   async createProject(project: InsertProject): Promise<Project> {
-    const [created] = await db.insert(projects).values(project).returning();
-    return created;
+    try {
+      const [created] = await db.insert(projects).values(project).returning();
+      return created;
+    } catch (error) {
+      logDbError("createProject", error);
+      return this.fallbackStorage.createProject(project);
+    }
   }
 
   async updateProject(id: number, project: Partial<InsertProject>): Promise<Project> {
-    const [updated] = await db
-      .update(projects)
-      .set(project)
-      .where(eq(projects.id, id))
-      .returning();
-    if (!updated) throw new Error("Project not found");
-    return updated;
+    try {
+      const [updated] = await db
+        .update(projects)
+        .set(project)
+        .where(eq(projects.id, id))
+        .returning();
+      if (!updated) throw new Error("Project not found");
+      return updated;
+    } catch (error) {
+      logDbError("updateProject", error);
+      return this.fallbackStorage.updateProject(id, project);
+    }
   }
 
   async deleteProject(id: number): Promise<boolean> {
-    const result = await db.delete(projects).where(eq(projects.id, id));
-    return result.rowCount > 0;
+    try {
+      const result = await db.delete(projects).where(eq(projects.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      logDbError("deleteProject", error);
+      return this.fallbackStorage.deleteProject(id);
+    }
   }
 
   async getAllExperiences(): Promise<Experience[]> {
-    return await db.select().from(experiences).orderBy(experiences.order);
+    try {
+      return await db.select().from(experiences).orderBy(experiences.order);
+    } catch (error) {
+      logDbError("getAllExperiences", error);
+      return this.fallbackStorage.getAllExperiences();
+    }
   }
 
   async getExperience(id: number): Promise<Experience | undefined> {
-    const [experience] = await db.select().from(experiences).where(eq(experiences.id, id));
-    return experience || undefined;
+    try {
+      const [experience] = await db.select().from(experiences).where(eq(experiences.id, id));
+      return experience || undefined;
+    } catch (error) {
+      logDbError("getExperience", error);
+      return this.fallbackStorage.getExperience(id);
+    }
   }
 
   async createExperience(experience: InsertExperience): Promise<Experience> {
-    const [created] = await db.insert(experiences).values(experience).returning();
-    return created;
+    try {
+      const [created] = await db.insert(experiences).values(experience).returning();
+      return created;
+    } catch (error) {
+      logDbError("createExperience", error);
+      return this.fallbackStorage.createExperience(experience);
+    }
   }
 
   async updateExperience(id: number, experience: Partial<InsertExperience>): Promise<Experience> {
-    const [updated] = await db
-      .update(experiences)
-      .set(experience)
-      .where(eq(experiences.id, id))
-      .returning();
-    if (!updated) throw new Error("Experience not found");
-    return updated;
+    try {
+      const [updated] = await db
+        .update(experiences)
+        .set(experience)
+        .where(eq(experiences.id, id))
+        .returning();
+      if (!updated) throw new Error("Experience not found");
+      return updated;
+    } catch (error) {
+      logDbError("updateExperience", error);
+      return this.fallbackStorage.updateExperience(id, experience);
+    }
   }
 
   async deleteExperience(id: number): Promise<boolean> {
-    const result = await db.delete(experiences).where(eq(experiences.id, id));
-    return result.rowCount > 0;
+    try {
+      const result = await db.delete(experiences).where(eq(experiences.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      logDbError("deleteExperience", error);
+      return this.fallbackStorage.deleteExperience(id);
+    }
   }
 
   async getAllBlogPosts(): Promise<BlogPost[]> {
-    return await db.select().from(blogPosts).orderBy(blogPosts.publishedAt);
+    try {
+      return await db.select().from(blogPosts).orderBy(blogPosts.publishedAt);
+    } catch (error) {
+      logDbError("getAllBlogPosts", error);
+      return this.fallbackStorage.getAllBlogPosts();
+    }
   }
 
   async getFeaturedBlogPosts(): Promise<BlogPost[]> {
-    return await db.select().from(blogPosts).where(eq(blogPosts.featured, true)).orderBy(blogPosts.publishedAt);
+    try {
+      return await db.select().from(blogPosts).where(eq(blogPosts.featured, true)).orderBy(blogPosts.publishedAt);
+    } catch (error) {
+      logDbError("getFeaturedBlogPosts", error);
+      return this.fallbackStorage.getFeaturedBlogPosts();
+    }
   }
 
   async getBlogPost(id: number): Promise<BlogPost | undefined> {
-    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
-    return post || undefined;
+    try {
+      const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+      return post || undefined;
+    } catch (error) {
+      logDbError("getBlogPost", error);
+      return this.fallbackStorage.getBlogPost(id);
+    }
   }
 
   async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
-    const [created] = await db.insert(blogPosts).values(post).returning();
-    return created;
+    try {
+      const [created] = await db.insert(blogPosts).values(post).returning();
+      return created;
+    } catch (error) {
+      logDbError("createBlogPost", error);
+      return this.fallbackStorage.createBlogPost(post);
+    }
   }
 
   async updateBlogPost(id: number, post: Partial<InsertBlogPost>): Promise<BlogPost> {
-    const [updated] = await db
-      .update(blogPosts)
-      .set(post)
-      .where(eq(blogPosts.id, id))
-      .returning();
-    if (!updated) throw new Error("Blog post not found");
-    return updated;
+    try {
+      const [updated] = await db
+        .update(blogPosts)
+        .set(post)
+        .where(eq(blogPosts.id, id))
+        .returning();
+      if (!updated) throw new Error("Blog post not found");
+      return updated;
+    } catch (error) {
+      logDbError("updateBlogPost", error);
+      return this.fallbackStorage.updateBlogPost(id, post);
+    }
   }
 
   async deleteBlogPost(id: number): Promise<boolean> {
-    const result = await db.delete(blogPosts).where(eq(blogPosts.id, id));
-    return result.rowCount > 0;
+    try {
+      const result = await db.delete(blogPosts).where(eq(blogPosts.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      logDbError("deleteBlogPost", error);
+      return this.fallbackStorage.deleteBlogPost(id);
+    }
   }
 
   async getAllTalks(): Promise<Talk[]> {
-    return await db.select().from(talks).orderBy(talks.date);
+    try {
+      return await db.select().from(talks).orderBy(talks.date);
+    } catch (error) {
+      logDbError("getAllTalks", error);
+      return this.fallbackStorage.getAllTalks();
+    }
   }
 
   async getTalk(id: number): Promise<Talk | undefined> {
-    const [talk] = await db.select().from(talks).where(eq(talks.id, id));
-    return talk || undefined;
+    try {
+      const [talk] = await db.select().from(talks).where(eq(talks.id, id));
+      return talk || undefined;
+    } catch (error) {
+      logDbError("getTalk", error);
+      return this.fallbackStorage.getTalk(id);
+    }
   }
 
   async createTalk(talk: InsertTalk): Promise<Talk> {
-    const [created] = await db.insert(talks).values(talk).returning();
-    return created;
+    try {
+      const [created] = await db.insert(talks).values(talk).returning();
+      return created;
+    } catch (error) {
+      logDbError("createTalk", error);
+      return this.fallbackStorage.createTalk(talk);
+    }
   }
 
   async updateTalk(id: number, talk: Partial<InsertTalk>): Promise<Talk> {
-    const [updated] = await db
-      .update(talks)
-      .set(talk)
-      .where(eq(talks.id, id))
-      .returning();
-    if (!updated) throw new Error("Talk not found");
-    return updated;
+    try {
+      const [updated] = await db
+        .update(talks)
+        .set(talk)
+        .where(eq(talks.id, id))
+        .returning();
+      if (!updated) throw new Error("Talk not found");
+      return updated;
+    } catch (error) {
+      logDbError("updateTalk", error);
+      return this.fallbackStorage.updateTalk(id, talk);
+    }
   }
 
   async deleteTalk(id: number): Promise<boolean> {
-    const result = await db.delete(talks).where(eq(talks.id, id));
-    return result.rowCount > 0;
+    try {
+      const result = await db.delete(talks).where(eq(talks.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      logDbError("deleteTalk", error);
+      return this.fallbackStorage.deleteTalk(id);
+    }
   }
 
   async getAllTranslations(): Promise<Translation[]> {
-    return await db.select().from(translations);
+    try {
+      return await db.select().from(translations);
+    } catch (error) {
+      logDbError("getAllTranslations", error);
+      return this.fallbackStorage.getAllTranslations();
+    }
   }
 
   async getTranslation(key: string): Promise<Translation | undefined> {
-    const [translation] = await db.select().from(translations).where(eq(translations.key, key));
-    return translation || undefined;
+    try {
+      const [translation] = await db.select().from(translations).where(eq(translations.key, key));
+      return translation || undefined;
+    } catch (error) {
+      logDbError("getTranslation", error);
+      return this.fallbackStorage.getTranslation(key);
+    }
   }
 
   async updateTranslation(key: string, translation: Partial<InsertTranslation>): Promise<Translation> {
-    const existing = await this.getTranslation(key);
-    
-    if (existing) {
-      const [updated] = await db
-        .update(translations)
-        .set(translation)
-        .where(eq(translations.key, key))
-        .returning();
-      return updated;
-    } else {
-      const [created] = await db
-        .insert(translations)
-        .values({ key, ...translation } as InsertTranslation)
-        .returning();
-      return created;
+    try {
+      const existing = await this.getTranslation(key);
+      
+      if (existing) {
+        const [updated] = await db
+          .update(translations)
+          .set(translation)
+          .where(eq(translations.key, key))
+          .returning();
+        return updated;
+      } else {
+        const [created] = await db
+          .insert(translations)
+          .values({ key, ...translation } as InsertTranslation)
+          .returning();
+        return created;
+      }
+    } catch (error) {
+      logDbError("updateTranslation", error);
+      return this.fallbackStorage.updateTranslation(key, translation);
     }
   }
 }
@@ -284,6 +430,8 @@ export class MemStorage implements IStorage {
         demoUrl: null,
         featured: true,
         order: 1,
+        descriptionDe: "",
+        createdAt: ""
       },
       {
         id: 2,
@@ -295,6 +443,8 @@ export class MemStorage implements IStorage {
         demoUrl: null,
         featured: true,
         order: 2,
+        descriptionDe: "",
+        createdAt: ""
       },
       {
         id: 3,
@@ -306,6 +456,8 @@ export class MemStorage implements IStorage {
         demoUrl: null,
         featured: true,
         order: 3,
+        descriptionDe: "",
+        createdAt: ""
       },
       {
         id: 4,
@@ -317,6 +469,8 @@ export class MemStorage implements IStorage {
         demoUrl: null,
         featured: false,
         order: 4,
+        descriptionDe: "",
+        createdAt: ""
       },
     ];
 
@@ -442,6 +596,20 @@ export class MemStorage implements IStorage {
     const updated: Profile = {
       ...profile,
       id: this.profile?.id || 1,
+      name: "",
+      title: "",
+      bio: "",
+      image: "",
+      email: "",
+      phone: "",
+      location: "",
+      github: "",
+      linkedin: "",
+      twitter: "",
+      xing: "",
+      cvEnglish: "",
+      cvGerman: "",
+      skills: []
     };
     this.profile = updated;
     return updated;
@@ -464,7 +632,19 @@ export class MemStorage implements IStorage {
 
   async createProject(project: InsertProject): Promise<Project> {
     const id = this.currentId++;
-    const newProject: Project = { ...project, id };
+    const newProject: Project = {
+      ...project, id,
+      title: "",
+      image: "",
+      description: "",
+      descriptionDe: "",
+      technologies: [],
+      githubUrl: "",
+      demoUrl: "",
+      featured: false,
+      order: 0,
+      createdAt: ""
+    };
     this.projects.set(id, newProject);
     return newProject;
   }
@@ -494,7 +674,17 @@ export class MemStorage implements IStorage {
 
   async createExperience(experience: InsertExperience): Promise<Experience> {
     const id = this.currentId++;
-    const newExperience: Experience = { ...experience, id };
+    const newExperience: Experience = {
+      ...experience, id,
+      title: "",
+      type: "",
+      description: "",
+      order: 0,
+      organization: "",
+      startDate: "",
+      endDate: "",
+      current: false
+    };
     this.experiences.set(id, newExperience);
     return newExperience;
   }
@@ -532,7 +722,16 @@ export class MemStorage implements IStorage {
 
   async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
     const id = this.currentId++;
-    const newPost: BlogPost = { ...post, id };
+    const newPost: BlogPost = {
+      ...post, id,
+      url: "",
+      title: "",
+      featured: false,
+      excerpt: "",
+      content: "",
+      publishedAt: "",
+      readTime: ""
+    };
     this.blogPosts.set(id, newPost);
     return newPost;
   }
@@ -564,7 +763,15 @@ export class MemStorage implements IStorage {
 
   async createTalk(talk: InsertTalk): Promise<Talk> {
     const id = this.currentId++;
-    const newTalk: Talk = { ...talk, id };
+    const newTalk: Talk = {
+      ...talk, id,
+      date: "",
+      title: "",
+      description: "",
+      event: "",
+      slidesUrl: "",
+      videoUrl: ""
+    };
     this.talks.set(id, newTalk);
     return newTalk;
   }
@@ -600,4 +807,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// Update the storage export to potentially use MemStorage if needed
+// You could also add an environment variable to control which storage to use
+export const storage = process.env.USE_MEM_STORAGE === 'true' 
+  ? new MemStorage() 
+  : new DatabaseStorage();

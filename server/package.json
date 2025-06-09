@@ -1,0 +1,30 @@
+{
+  "name": "portfolio-server",
+  "version": "1.0.0",
+  "description": "Backend server for Saad Hasan's portfolio project",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon index.ts",
+    "build": "tsc --noEmitOnError false"
+  },
+  "dependencies": {
+    "nodemon": "^3.1.0",
+    "typescript": "^5.4.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "ws": "^8.18.0",
+    "@neondatabase/serverless": "^1.0.1",
+    "drizzle-orm": "^0.39.3",
+    "drizzle-zod": "^0.7.1",
+    "express-session": "^1.18.1",
+    "nanoid": "^5.0.6",
+    "vite": "^5.2.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "@types/express-session": "^1.17.8",
+    "@types/nanoid": "^3.0.0"
+  }
+}

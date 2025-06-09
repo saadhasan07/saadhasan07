@@ -86,14 +86,12 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // ALWAYS serve the app on the port provided by Railway or default to 80
+  const port = process.env.PORT || 80;
+  const host = "0.0.0.0";
   server.listen({
     port,
-    host: "0.0.0.0",
-    reusePort: true,
+    host
   }, () => {
     log(`serving on port ${port}`);
   });
