@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon index.ts",
-    "build": "tsc"
+    "build": "tsc --noEmitOnError false"
   },
   "dependencies": {
     "nodemon": "^3.1.0",
