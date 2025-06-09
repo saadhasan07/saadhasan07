@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
@@ -15,7 +15,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/auth", checkAdminAuth);
 
   // Apply admin auth middleware to admin routes
-  app.use("/api/admin/*", requireAdminAuth);
+  app.use("/api/admin", requireAdminAuth);
   app.use("/admin", requireAdminAuth);
 
   // Profile routes
@@ -168,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "GitHub projects synced successfully", result });
     } catch (error) {
       console.error("GitHub sync error:", error);
-      res.status(500).json({ message: "Failed to sync GitHub projects", error: error instanceof Error ? error.message : "Unknown error" });
+      res.status(500).json({ message: "Failed to sync GitHub projects", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -303,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/translations/:key", async (req, res) => {
+  app.get("/api/translations/:key", async (req: Request, res: Response) => {
     try {
       const key = req.params.key;
       const translation = await storage.getTranslation(key);
@@ -316,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/translations/:key", async (req, res) => {
+  app.put("/api/translations/:key", async (req: Request, res: Response) => {
     try {
       const key = req.params.key;
       const translation = await storage.updateTranslation(key, req.body);
@@ -326,22 +326,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // CV download routes
-  app.get("/api/cv/:language", async (req, res) => {
+  app.get("/api/cv/:language", async (req: Request, res: Response) => {
     try {
       const language = req.params.language;
       const profile = await storage.getProfile();
-      
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });
       }
-
       const cvUrl = language === 'de' ? profile.cvGerman : profile.cvEnglish;
-      
       if (!cvUrl) {
         return res.status(404).json({ message: "CV not found for this language" });
       }
-
       res.json({ url: cvUrl });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch CV" });
@@ -357,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "GitHub projects synced successfully" });
     } catch (error) {
       console.error("GitHub sync error:", error);
-      res.status(500).json({ message: "Failed to sync GitHub projects", error: error.message });
+      res.status(500).json({ message: "Failed to sync GitHub projects", error: error instanceof Error ? error.message : String(error) });
     }
   });
 

@@ -13,5 +13,5 @@
       "@shared/*": ["../shared/*"]
     }
   },
-  "include": ["*.ts"]
+  "include": ["**/*.ts"]
 }
