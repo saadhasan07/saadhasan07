@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Github, Star } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { useProjects } from "@/hooks/useStaticData";
+import { getProjectPreviewImage } from "@/lib/project-preview";
 import type { Project } from "@shared/schema";
 import { useMemo, useState } from "react";
 
@@ -92,15 +93,13 @@ export default function ProjectTimeline() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProjects.map((project) => (
             <Card key={project.id} className="hover:shadow-lg transition-all duration-300 border border-border/20 bg-card/50 backdrop-blur-sm">
-              {project.image && (
-                <div className="relative h-48 overflow-hidden rounded-t-lg">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-              )}
+              <div className="relative h-48 overflow-hidden rounded-t-lg">
+                <img
+                  src={getProjectPreviewImage(project)}
+                  alt={project.title}
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                />
+              </div>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-3 gap-3">
                   <h3 className="text-xl font-semibold text-foreground mb-2">
