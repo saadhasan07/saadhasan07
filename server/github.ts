@@ -65,17 +65,29 @@ export async function syncGitHubProjects(username: string = resolveGitHubUsernam
   try {
     const repos = await fetchGitHubRepositories(username);
     const existingProjects = await storage.getAllProjects();
-    const existingByGitHubUrl = new Map(
+    const existingByRepoKey = new Map(
       existingProjects
-        .filter((project) => !!project.githubUrl)
-        .map((project) => [project.githubUrl as string, project]),
+        .map((project) => [normalizeProjectRepoKey(project), project] as const)
+        .filter((entry): entry is [string, Project] => !!entry[0]),
     );
+    const existingByTitleKey = new Map(
+      existingProjects
+        .map((project) => [normalizeTitleKey(project.title), project] as const)
+        .filter((entry): entry is [string, Project] => !!entry[0]),
+    );
+    const reusablePlaceholders = existingProjects.filter(isBlankProjectPlaceholder);
 
     const syncedProjects: Project[] = [];
     let nextOrder = existingProjects.reduce((max, project) => Math.max(max, project.order ?? 0), 0) + 1;
 
     for (const repo of repos) {
-      const existingProject = existingByGitHubUrl.get(repo.html_url);
+      const repoKey = normalizeRepoKey(repo.html_url);
+      const titleKey = normalizeTitleKey(formatRepositoryName(repo.name));
+      const existingProject =
+        (repoKey ? existingByRepoKey.get(repoKey) : undefined) ||
+        existingByTitleKey.get(titleKey) ||
+        reusablePlaceholders.shift();
+
       const technologies = [
         repo.language && repo.language !== "null" ? repo.language : null,
         ...repo.topics,
@@ -87,7 +99,7 @@ export async function syncGitHubProjects(username: string = resolveGitHubUsernam
           repo.description ||
           `A ${repo.language || "software"} project showcasing development skills and best practices.`,
         descriptionDe: existingProject?.descriptionDe || null,
-        image: repo.open_graph_image_url || existingProject?.image || getProjectImage(repo.language, repo.topics),
+        image: existingProject?.image || repo.open_graph_image_url || getProjectImage(repo.language, repo.topics),
         technologies: technologies.length > 0 ? technologies : ["Software Development"],
         githubUrl: repo.html_url,
         demoUrl: sanitizeHomepage(repo.homepage) || existingProject?.demoUrl || null,
@@ -96,13 +108,15 @@ export async function syncGitHubProjects(username: string = resolveGitHubUsernam
         createdAt: existingProject?.createdAt || repo.pushed_at.split("T")[0],
       };
 
-      if (existingProject) {
-        const updatedProject = await storage.updateProject(existingProject.id, projectData);
-        syncedProjects.push(updatedProject);
-      } else {
-        const createdProject = await storage.createProject(projectData);
-        syncedProjects.push(createdProject);
+      const syncedProject = existingProject
+        ? await storage.updateProject(existingProject.id, projectData)
+        : await storage.createProject(projectData);
+
+      if (repoKey) {
+        existingByRepoKey.set(repoKey, syncedProject);
       }
+      existingByTitleKey.set(titleKey, syncedProject);
+      syncedProjects.push(syncedProject);
     }
 
     lastGitHubSyncAt = Date.now();
@@ -159,6 +173,45 @@ function sanitizeHomepage(homepage: string | null) {
 
 function formatRepositoryName(name: string) {
   return name.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function normalizeRepoKey(url: string | null | undefined) {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname !== "github.com") {
+      return null;
+    }
+
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length < 2) {
+      return null;
+    }
+
+    return `${segments[0].toLowerCase()}/${segments[1].replace(/\.git$/, "").toLowerCase()}`;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeTitleKey(title: string | null | undefined) {
+  if (!title) {
+    return null;
+  }
+
+  const normalized = title.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return normalized || null;
+}
+
+function normalizeProjectRepoKey(project: Project) {
+  return normalizeRepoKey(project.githubUrl);
+}
+
+function isBlankProjectPlaceholder(project: Project) {
+  return !project.title && !project.description && !project.githubUrl;
 }
 
 function getProjectImage(language: string | null, topics: string[]): string {
