@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Github, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { apiRequest } from "@/lib/api";
+import { getProjectPreviewImage } from "@/lib/project-preview";
 import type { Project } from "@shared/schema";
 import ProjectTooltip from "@/components/project-tooltip";
 import { useState, useRef } from "react";
@@ -106,7 +107,7 @@ export default function ProjectsSection() {
             >
               <div className="relative">
                 <img
-                  src={project.image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400"}
+                  src={getProjectPreviewImage(project)}
                   alt={project.title}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
