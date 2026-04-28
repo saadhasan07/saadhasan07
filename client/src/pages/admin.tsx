@@ -20,7 +20,6 @@ export default function AdminPage() {
   const [isGitHubSyncing, setIsGitHubSyncing] = useState(false);
   const { isAuthenticated, isLoading } = useAdminAuth();
 
-  // Fetch data - always called, but only fetches when authenticated
   const { data: projects = [] } = useQuery<Project[]>({
     queryKey: ["/api/projects"],
     enabled: isAuthenticated,
@@ -36,7 +35,6 @@ export default function AdminPage() {
     enabled: isAuthenticated,
   });
 
-  // All mutations must be declared before any conditional returns
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("POST", "/api/admin/logout");
@@ -51,29 +49,28 @@ export default function AdminPage() {
     },
   });
 
-  // GitHub sync mutation
   const syncGitHubMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("POST", "/api/admin/sync-github");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects/featured"] });
       toast({
         title: "GitHub Sync Complete",
-        description: "Projects have been synced from your GitHub repositories.",
+        description: `${data?.result?.length ?? 0} repositories were synced into your portfolio.`,
       });
     },
     onError: (error) => {
       toast({
         title: "Sync Failed",
-        description: "Failed to sync GitHub repositories. Please check your GitHub token.",
+        description: error instanceof Error ? error.message : "Failed to sync GitHub repositories.",
         variant: "destructive",
       });
     },
   });
 
-  // All other mutations and handlers must be declared here too
   const handleGitHubSync = async () => {
     setIsGitHubSyncing(true);
     try {
@@ -83,7 +80,6 @@ export default function AdminPage() {
     }
   };
 
-  // Conditional returns AFTER all hooks
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -93,7 +89,7 @@ export default function AdminPage() {
   }
 
   if (!isAuthenticated) {
-    return null; // useAdminAuth will handle redirect
+    return null;
   }
 
   return (
@@ -111,7 +107,7 @@ export default function AdminPage() {
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
-              onClick={() => window.location.href = "/"}
+              onClick={() => (window.location.href = "/")}
               className="flex items-center gap-2 bg-white dark:bg-slate-800 border-2 border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +186,7 @@ export default function AdminPage() {
                     <li>• Fetches your public repositories from GitHub</li>
                     <li>• Automatically creates project entries for new repositories</li>
                     <li>• Updates existing projects with latest information</li>
-                    <li>• Marks featured projects based on stars and activity</li>
+                    <li>• Brings in homepage links and repo preview images when available</li>
                   </ul>
                 </div>
               </CardContent>
