@@ -1,9 +1,12 @@
 import { useLanguage } from "@/hooks/use-language";
-import { Github, Linkedin, Twitter, Mail } from "lucide-react";
+import { useProfile } from "@/hooks/useStaticData";
+import { Github, Linkedin, Mail } from "lucide-react";
+import { SiXing } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 
 export default function Footer() {
   const { t } = useLanguage();
+  const { data: profile } = useProfile();
 
   const quickLinks = [
     { id: "about", label: t("nav.about") },
@@ -22,11 +25,11 @@ export default function Footer() {
   };
 
   const socialLinks = [
-    { icon: Github, href: "#", label: "GitHub" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Mail, href: "#", label: "Email" },
-  ];
+    { icon: Github, href: profile?.github, label: "GitHub" },
+    { icon: Linkedin, href: profile?.linkedin, label: "LinkedIn" },
+    { icon: SiXing, href: profile?.xing, label: "XING" },
+    { icon: Mail, href: profile?.email ? `mailto:${profile.email}` : undefined, label: "Email" },
+  ].filter((social) => Boolean(social.href));
 
   return (
     <footer className="bg-card border-t border-border py-12">
@@ -37,7 +40,7 @@ export default function Footer() {
               © 2024 Saad Hasan. {t("footer.rights")}
             </p>
           </div>
-          
+
           <div className="flex items-center space-x-6">
             <div className="hidden md:flex space-x-6">
               {quickLinks.slice(0, 3).map((link) => (
@@ -57,7 +60,7 @@ export default function Footer() {
                 Admin
               </a>
             </div>
-            
+
             <div className="flex space-x-2">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
