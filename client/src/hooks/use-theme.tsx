@@ -21,6 +21,23 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
+function getPreferredTheme(defaultTheme: Theme): Theme {
+  if (typeof window === "undefined") {
+    return defaultTheme;
+  }
+
+  try {
+    const savedTheme = window.localStorage.getItem("theme");
+    if (savedTheme === "dark" || savedTheme === "light") {
+      return savedTheme;
+    }
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  } catch {
+    return defaultTheme;
+  }
+}
+
 export function ThemeProvider({
   children,
   defaultTheme = "light",
@@ -29,27 +46,24 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(defaultTheme);
 
   useEffect(() => {
-    // Check for saved theme preference or default to system preference
-    const savedTheme = localStorage.getItem("theme") as Theme;
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-
-    const initialTheme = savedTheme || systemTheme;
-    setTheme(initialTheme);
-  }, []);
+    setTheme(getPreferredTheme(defaultTheme));
+  }, [defaultTheme]);
 
   useEffect(() => {
     const root = window.document.documentElement;
-    
+
     root.classList.remove("light", "dark");
     root.classList.add(theme);
-    
-    localStorage.setItem("theme", theme);
+
+    try {
+      window.localStorage.setItem("theme", theme);
+    } catch {
+      // Ignore storage access errors.
+    }
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
   };
 
   const value = {
