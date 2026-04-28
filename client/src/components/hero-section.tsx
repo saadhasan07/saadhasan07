@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Download, Mail, Github, Linkedin, Twitter } from "lucide-react";
+import { Download, Mail, Github, Linkedin } from "lucide-react";
 import { SiXing } from "react-icons/si";
 import { useLanguage } from "@/hooks/use-language";
 import { useProfile } from "@/hooks/useStaticData";
 import { apiRequest } from "@/lib/api";
+import { getLocalizedProfile } from "@/lib/localized-content";
 import avatarImage from "@assets/Saad Hasan avatar.jpg";
 import zenBackground from "@assets/zen header.webp";
 
@@ -18,7 +19,7 @@ export default function HeroSection() {
       if (data.url) {
         const link = document.createElement("a");
         link.href = data.url;
-        link.download = language === 'de' ? "Saad-Hasan-CV-German.docx" : "Saad-Hasan-CV-English.docx";
+        link.download = language === "de" ? "Saad-Hasan-CV-German.docx" : "Saad-Hasan-CV-English.docx";
         link.click();
       }
     } catch (error) {
@@ -69,27 +70,26 @@ export default function HeroSection() {
     return (
       <section id="about" className="section-padding academic-gradient">
         <div className="container-width text-center">
-          <p className="text-muted-foreground">Unable to load profile information.</p>
+          <p className="text-muted-foreground">{t("common.unableToLoadProfile")}</p>
         </div>
       </section>
     );
   }
 
+  const localizedProfile = getLocalizedProfile(profile, language);
+
   return (
     <section id="about" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Zen bamboo background */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url(${zenBackground})`,
         }}
       ></div>
-      {/* Overlay for better text readability */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent dark:from-black/60 dark:via-black/40 dark:to-transparent"></div>
-      
+
       <div className="container-width relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Profile Content */}
           <div className="order-2 lg:order-1 slide-up">
             <h1 className="text-4xl lg:text-5xl font-bold mb-6">
               <span className="text-white/90">{t("hero.greeting")}</span>
@@ -98,14 +98,13 @@ export default function HeroSection() {
             </h1>
 
             <h2 className="text-xl lg:text-2xl text-white/80 mb-6 font-light">
-              {profile.title}
+              {localizedProfile.title}
             </h2>
 
             <p className="text-lg text-white/75 mb-8 leading-relaxed">
-              {profile.bio}
+              {localizedProfile.bio}
             </p>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Button onClick={handleDownloadCV} className="secondary-button">
                 <Download className="w-5 h-5" />
@@ -118,7 +117,6 @@ export default function HeroSection() {
               </Button>
             </div>
 
-            {/* Social Links */}
             <div className="flex space-x-4">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
@@ -144,7 +142,6 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Profile Image */}
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end fade-in">
             <div className="relative mt-32 lg:mt-40">
               <img
@@ -154,7 +151,6 @@ export default function HeroSection() {
                 style={{ objectPosition: "center 40%" }}
               />
 
-              {/* Decorative elements */}
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-xl"></div>
               <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-green-500/10 rounded-full blur-xl"></div>
             </div>
