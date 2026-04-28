@@ -1,10 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Github, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import { apiRequest } from "@/lib/api";
+import { useProjects } from "@/hooks/useStaticData";
 import { getProjectPreviewImage } from "@/lib/project-preview";
 import type { Project } from "@shared/schema";
 import ProjectTooltip from "@/components/project-tooltip";
@@ -18,13 +17,7 @@ export default function ProjectsSection() {
   } | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const { data: projects = [], isLoading } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
-    queryFn: async () => {
-      const response = await apiRequest("GET", "/api/projects");
-      return response.json();
-    },
-  });
+  const { data: projects = [], isLoading } = useProjects();
 
   const handleMouseEnter = (project: Project, event: React.MouseEvent) => {
     const rect = event.currentTarget.getBoundingClientRect();
