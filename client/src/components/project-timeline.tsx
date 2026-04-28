@@ -41,7 +41,7 @@ export default function ProjectTimeline() {
 
   if (isLoading) {
     return (
-      <section className="section-padding bg-card">
+      <section id="project-journey" className="section-padding bg-card">
         <div className="container-width">
           <div className="text-center mb-16">
             <div className="h-10 bg-muted rounded skeleton mx-auto mb-4 max-w-md"></div>
@@ -58,14 +58,14 @@ export default function ProjectTimeline() {
   }
 
   return (
-    <section className="section-padding bg-card">
+    <section id="project-journey" className="section-padding bg-card">
       <div className="container-width">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-4">
-            {t("projects.title", "Projects")}
+            {t("timeline.title")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {t("projects.description", "A selection of projects I've worked on, showcasing different skills and technologies.")}
+            {t("timeline.description")}
           </p>
         </div>
 
@@ -75,7 +75,7 @@ export default function ProjectTimeline() {
               variant={selectedYear === null ? "default" : "outline"}
               onClick={() => setSelectedYear(null)}
             >
-              All Projects
+              {t("timeline.allProjects")}
             </Button>
             {years.map((year) => (
               <Button
@@ -109,7 +109,7 @@ export default function ProjectTimeline() {
                   {project.featured && (
                     <Badge variant="default" className="bg-primary text-primary-foreground shrink-0">
                       <Star size={12} className="mr-1" />
-                      Featured
+                      {t("projects.featured")}
                     </Badge>
                   )}
                 </div>
@@ -128,7 +128,7 @@ export default function ProjectTimeline() {
                     <Button size="sm" variant="outline" asChild>
                       <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                         <Github size={16} />
-                        Code
+                        {t("projects.code")}
                       </a>
                     </Button>
                   )}
@@ -136,7 +136,7 @@ export default function ProjectTimeline() {
                     <Button size="sm" asChild>
                       <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                         <ExternalLink size={16} />
-                        Live Demo
+                        {t("projects.liveDemo")}
                       </a>
                     </Button>
                   )}
