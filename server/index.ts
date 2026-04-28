@@ -4,37 +4,51 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+const isProduction = process.env.NODE_ENV === "production";
+
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Setup session middleware before routes
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false, // Set to true in production with HTTPS
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "dev-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: isProduction,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  }),
+);
 
-// Serve attached assets with proper headers for CV downloads
-app.use('/attached_assets', express.static('attached_assets', {
-  setHeaders: (res, path) => {
-    if (path.includes('CV') || path.includes('Lebenslauf')) {
-      const filename = path.split('/').pop() || '';
-      if (filename.endsWith('.pdf')) {
-        const downloadName = filename.includes("English") ? "Saad-Hasan-CV-English.pdf" : "Saad-Hasan-CV-German.pdf";
-        res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
-        res.setHeader('Content-Type', 'application/pdf');
-      } else if (filename.endsWith('.docx')) {
-        const downloadName = filename.includes("English") ? "Saad-Hasan-CV-English.docx" : "Saad-Hasan-CV-German.docx";
-        res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+app.use(
+  "/attached_assets",
+  express.static("attached_assets", {
+    setHeaders: (res, path) => {
+      if (path.includes("CV") || path.includes("Lebenslauf")) {
+        const filename = path.split("/").pop() || "";
+        if (filename.endsWith(".pdf")) {
+          const downloadName = filename.includes("English")
+            ? "Saad-Hasan-CV-English.pdf"
+            : "Saad-Hasan-CV-German.pdf";
+          res.setHeader("Content-Disposition", `attachment; filename="${downloadName}"`);
+          res.setHeader("Content-Type", "application/pdf");
+        } else if (filename.endsWith(".docx")) {
+          const downloadName = filename.includes("English")
+            ? "Saad-Hasan-CV-English.docx"
+            : "Saad-Hasan-CV-German.docx";
+          res.setHeader("Content-Disposition", `attachment; filename="${downloadName}"`);
+          res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          );
+        }
       }
-    }
-  }
-}));
+    },
+  }),
+);
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -77,22 +91,21 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port provided by Railway or default to 80
   const port = process.env.PORT || 80;
   const host = "0.0.0.0";
-  server.listen({
-    port,
-    host
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  server.listen(
+    {
+      port,
+      host,
+    },
+    () => {
+      log(`serving on port ${port}`);
+    },
+  );
 })();
