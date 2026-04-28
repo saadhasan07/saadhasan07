@@ -22,11 +22,15 @@ function normalizeGitHubRepo(url: string) {
 }
 
 export function getProjectPreviewImage(project: Project) {
+  if (project.image) {
+    return project.image;
+  }
+
   const repo = project.githubUrl ? normalizeGitHubRepo(project.githubUrl) : null;
 
   if (repo) {
     return `https://opengraph.githubassets.com/1/${repo.owner}/${repo.repo}`;
   }
 
-  return project.image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400";
+  return "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400";
 }
