@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Code, ExternalLink, Github, Star } from "lucide-react";
+import { ExternalLink, Github, Star } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { useProjects } from "@/hooks/useStaticData";
 import type { Project } from "@shared/schema";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function ProjectTimeline() {
   const { t, language } = useLanguage();
@@ -13,28 +13,35 @@ export default function ProjectTimeline() {
 
   const { data: projects = [], isLoading } = useProjects();
 
-  // Group projects by year (using order field as fallback for dates)
-  const projectsByYear = projects.reduce((acc: Record<number, Project[]>, project: Project) => {
-    // Use createdAt if available, otherwise use current year
-    const year = project.createdAt ? new Date(project.createdAt).getFullYear() : 2024;
-    if (!acc[year]) {
-      acc[year] = [];
+  const projectsByYear = useMemo(() => {
+    return projects.reduce((acc: Record<number, Project[]>, project: Project) => {
+      const parsedDate = new Date(project.createdAt || "2024-01-01");
+      const year = Number.isNaN(parsedDate.getTime()) ? 2024 : parsedDate.getFullYear();
+
+      if (!acc[year]) {
+        acc[year] = [];
+      }
+
+      acc[year].push(project);
+      return acc;
+    }, {});
+  }, [projects]);
+
+  const years = useMemo(() => {
+    return Object.keys(projectsByYear).map(Number).sort((a, b) => b - a);
+  }, [projectsByYear]);
+
+  const filteredProjects = useMemo(() => {
+    if (selectedYear) {
+      return projectsByYear[selectedYear] || [];
     }
-    acc[year].push(project);
-    return acc;
-  }, {});
 
-  // Get years in descending order
-  const years = Object.keys(projectsByYear).map(Number).sort((a: number, b: number) => b - a);
-
-  // Filter projects by selected year
-  const filteredProjects = selectedYear
-    ? projectsByYear[selectedYear] || []
-    : projects.sort((a: Project, b: Project) => b.order - a.order);
+    return [...projects].sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+  }, [projects, projectsByYear, selectedYear]);
 
   if (isLoading) {
     return (
-      <section id="projects" className="section-padding bg-card">
+      <section className="section-padding bg-card">
         <div className="container-width">
           <div className="text-center mb-16">
             <div className="h-10 bg-muted rounded skeleton mx-auto mb-4 max-w-md"></div>
@@ -51,7 +58,7 @@ export default function ProjectTimeline() {
   }
 
   return (
-    <section id="projects" className="section-padding bg-card">
+    <section className="section-padding bg-card">
       <div className="container-width">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-4">
@@ -70,7 +77,7 @@ export default function ProjectTimeline() {
             >
               All Projects
             </Button>
-            {years.map((year: number) => (
+            {years.map((year) => (
               <Button
                 key={year}
                 variant={selectedYear === year ? "default" : "outline"}
@@ -83,7 +90,7 @@ export default function ProjectTimeline() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProjects.map((project: Project, index: number) => (
+          {filteredProjects.map((project) => (
             <Card key={project.id} className="hover:shadow-lg transition-all duration-300 border border-border/20 bg-card/50 backdrop-blur-sm">
               {project.image && (
                 <div className="relative h-48 overflow-hidden rounded-t-lg">
@@ -95,19 +102,19 @@ export default function ProjectTimeline() {
                 </div>
               )}
               <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-3 gap-3">
                   <h3 className="text-xl font-semibold text-foreground mb-2">
                     {project.title}
                   </h3>
                   {project.featured && (
-                    <Badge variant="default" className="bg-primary/bg-primary text-primary-foreground">
+                    <Badge variant="default" className="bg-primary text-primary-foreground shrink-0">
                       <Star size={12} className="mr-1" />
                       Featured
                     </Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  {project.description}
+                  {language === "de" && (project as any).descriptionDe ? (project as any).descriptionDe : project.description}
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {project.technologies?.map((tech: string) => (
@@ -125,9 +132,9 @@ export default function ProjectTimeline() {
                       </a>
                     </Button>
                   )}
-                  {project.liveUrl && (
+                  {project.demoUrl && (
                     <Button size="sm" asChild>
-                      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                      <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                         <ExternalLink size={16} />
                         Live Demo
                       </a>
