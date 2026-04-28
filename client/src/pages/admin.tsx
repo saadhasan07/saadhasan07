@@ -201,6 +201,7 @@ export default function AdminPage() {
 function ProjectsManager({ projects }: { projects: Project[] }) {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const visibleProjects = projects.filter((project) => Boolean(project.title && project.description && project.githubUrl));
 
   return (
     <div className="space-y-6">
@@ -230,7 +231,7 @@ function ProjectsManager({ projects }: { projects: Project[] }) {
       )}
 
       <div className="grid gap-4">
-        {projects.map((project) => (
+        {visibleProjects.map((project) => (
           <Card key={project.id} className="p-4">
             <div className="flex justify-between items-start">
               <div className="flex-1">
