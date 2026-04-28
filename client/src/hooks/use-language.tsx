@@ -26,23 +26,25 @@ function isLanguage(value: string | null): value is Language {
   return value === "en" || value === "de";
 }
 
+function getInitialLanguage(defaultLanguage: Language): Language {
+  if (typeof window === "undefined") {
+    return defaultLanguage;
+  }
+
+  try {
+    const savedLanguage = window.localStorage.getItem("language");
+    return isLanguage(savedLanguage) ? savedLanguage : defaultLanguage;
+  } catch {
+    return defaultLanguage;
+  }
+}
+
 export function LanguageProvider({
   children,
   defaultLanguage = "en",
   ...props
 }: LanguageProviderProps) {
-  const [language, setLanguageState] = useState<Language>(defaultLanguage);
-
-  useEffect(() => {
-    try {
-      const savedLanguage = window.localStorage.getItem("language");
-      if (isLanguage(savedLanguage) && savedLanguage !== language) {
-        setLanguageState(savedLanguage);
-      }
-    } catch {
-      // Ignore storage access errors and keep the default language.
-    }
-  }, [language]);
+  const [language, setLanguageState] = useState<Language>(() => getInitialLanguage(defaultLanguage));
 
   useEffect(() => {
     document.documentElement.lang = language;
