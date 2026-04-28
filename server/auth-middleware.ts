@@ -15,15 +15,11 @@ export const requireAdminAuth = (req: Request, res: Response, next: NextFunction
     return next();
   }
 
-  if (req.originalUrl.startsWith('/api/admin')) {
+  if (req.originalUrl.startsWith('/api/')) {
     return res.status(401).json({ message: 'Admin authentication required' });
   }
 
-  if (req.originalUrl.startsWith('/admin')) {
-    return res.redirect('/admin/login');
-  }
-
-  next();
+  return next();
 };
 
 export const adminLogin = (req: Request, res: Response) => {
