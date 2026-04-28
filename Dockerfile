@@ -1,14 +1,12 @@
-# Use official Node.js LTS image
 FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package.json ./
-COPY . .
+COPY package.json package-lock.json ./
+RUN npm ci
 
-RUN npm install
+COPY . .
 RUN npm run build
-RUN npm run db:push
 
 EXPOSE 80
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npm run db:push && npm start"]
