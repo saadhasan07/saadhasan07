@@ -58,7 +58,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/auth", checkAdminAuth);
 
   app.use("/api/admin", requireAdminAuth);
-  app.use("/admin", requireAdminAuth);
 
   app.get("/api/profile", async (_req, res) => {
     try {
