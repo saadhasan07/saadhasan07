@@ -3,10 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/use-language";
 import { apiRequest } from "@/lib/api";
+import { getLocalizedExperience } from "@/lib/localized-content";
 import type { Experience } from "@shared/schema";
 
 export default function ExperienceSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const { data: experiences = [], isLoading } = useQuery<Experience[]>({
     queryKey: ["/api/experiences"],
@@ -55,20 +56,20 @@ export default function ExperienceSection() {
             <div className="space-y-12">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="relative flex items-center md:justify-center">
-                  <div className="absolute left-6 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 skeleton rounded-full" style={{animationDelay: `${i * 0.2}s`}}></div>
-                  <div className={`ml-16 md:ml-0 md:w-1/2 ${i % 2 === 0 ? 'md:pr-8' : 'md:pl-8 md:ml-1/2'}`}>
+                  <div className="absolute left-6 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 skeleton rounded-full" style={{ animationDelay: `${i * 0.2}s` }}></div>
+                  <div className={`ml-16 md:ml-0 md:w-1/2 ${i % 2 === 0 ? "md:pr-8" : "md:pl-8 md:ml-1/2"}`}>
                     <Card className="skeleton-wave relative overflow-hidden">
                       <CardContent className="p-6">
                         <div className="flex items-center gap-2 mb-3">
-                          <div className="h-6 w-16 skeleton rounded-full" style={{animationDelay: `${i * 0.2 + 0.1}s`}}></div>
+                          <div className="h-6 w-16 skeleton rounded-full" style={{ animationDelay: `${i * 0.2 + 0.1}s` }}></div>
                         </div>
-                        <div className="h-6 skeleton rounded mb-2" style={{animationDelay: `${i * 0.2 + 0.2}s`}}></div>
-                        <div className="h-5 skeleton rounded w-3/4 mb-2" style={{animationDelay: `${i * 0.2 + 0.3}s`}}></div>
-                        <div className="h-4 skeleton rounded w-1/2 mb-3" style={{animationDelay: `${i * 0.2 + 0.4}s`}}></div>
+                        <div className="h-6 skeleton rounded mb-2" style={{ animationDelay: `${i * 0.2 + 0.2}s` }}></div>
+                        <div className="h-5 skeleton rounded w-3/4 mb-2" style={{ animationDelay: `${i * 0.2 + 0.3}s` }}></div>
+                        <div className="h-4 skeleton rounded w-1/2 mb-3" style={{ animationDelay: `${i * 0.2 + 0.4}s` }}></div>
                         <div className="space-y-2">
-                          <div className="h-4 skeleton rounded" style={{animationDelay: `${i * 0.2 + 0.5}s`}}></div>
-                          <div className="h-4 skeleton rounded w-5/6" style={{animationDelay: `${i * 0.2 + 0.6}s`}}></div>
-                          <div className="h-4 skeleton rounded w-4/5" style={{animationDelay: `${i * 0.2 + 0.7}s`}}></div>
+                          <div className="h-4 skeleton rounded" style={{ animationDelay: `${i * 0.2 + 0.5}s` }}></div>
+                          <div className="h-4 skeleton rounded w-5/6" style={{ animationDelay: `${i * 0.2 + 0.6}s` }}></div>
+                          <div className="h-4 skeleton rounded w-4/5" style={{ animationDelay: `${i * 0.2 + 0.7}s` }}></div>
                         </div>
                       </CardContent>
                     </Card>
@@ -95,48 +96,47 @@ export default function ExperienceSection() {
         </div>
 
         <div className="relative">
-          {/* Timeline Line */}
           <div className="absolute left-8 md:left-1/2 transform md:-translate-x-0.5 top-0 bottom-0 w-0.5 bg-border"></div>
 
           <div className="space-y-12">
-            {experiences.map((experience, index) => (
-              <div
-                key={experience.id}
-                className={`relative flex items-center md:justify-center ${
-                  index % 2 === 0 ? "" : "md:flex-row-reverse"
-                }`}
-              >
-                {/* Timeline Dot */}
-                <div className={`absolute left-6 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 ${getTypeColor(experience.type)} rounded-full border-4 border-background z-10`}></div>
+            {experiences.map((experience, index) => {
+              const localizedExperience = getLocalizedExperience(experience, language);
 
-                {/* Content Card */}
-                <div className={`ml-16 md:ml-0 md:w-1/2 ${index % 2 === 0 ? "md:pr-8 md:text-right" : "md:pl-8"}`}>
-                  <Card className="card-hover">
-                    <CardContent className="p-6">
-                      <div className="mb-2">
-                        <Badge className={`text-xs font-medium ${getTypeBadgeColor(experience.type)}`}>
-                          {experience.current ? t("experience.current") : t(`experience.${experience.type}`)}
-                        </Badge>
-                      </div>
-                      <h3 className="text-xl font-bold text-green-700 dark:text-green-300 mb-2">
-                        {experience.title}
-                      </h3>
-                      <p className="text-green-600 dark:text-green-400 font-medium mb-2">
-                        {experience.organization}
-                      </p>
-                      <p className="text-sm text-green-600 dark:text-green-400 mb-3">
-                        {experience.startDate}
-                        {experience.endDate && ` - ${experience.endDate}`}
-                        {experience.current && ` - ${t("experience.present")}`}
-                      </p>
-                      <p className="text-green-600 dark:text-green-400 text-sm leading-relaxed">
-                        {experience.description}
-                      </p>
-                    </CardContent>
-                  </Card>
+              return (
+                <div
+                  key={experience.id}
+                  className={`relative flex items-center md:justify-center ${index % 2 === 0 ? "" : "md:flex-row-reverse"}`}
+                >
+                  <div className={`absolute left-6 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 ${getTypeColor(experience.type)} rounded-full border-4 border-background z-10`}></div>
+
+                  <div className={`ml-16 md:ml-0 md:w-1/2 ${index % 2 === 0 ? "md:pr-8 md:text-right" : "md:pl-8"}`}>
+                    <Card className="card-hover">
+                      <CardContent className="p-6">
+                        <div className="mb-2">
+                          <Badge className={`text-xs font-medium ${getTypeBadgeColor(experience.type)}`}>
+                            {experience.current ? t("experience.current") : t(`experience.${experience.type}`)}
+                          </Badge>
+                        </div>
+                        <h3 className="text-xl font-bold text-green-700 dark:text-green-300 mb-2">
+                          {localizedExperience.title}
+                        </h3>
+                        <p className="text-green-600 dark:text-green-400 font-medium mb-2">
+                          {localizedExperience.organization}
+                        </p>
+                        <p className="text-sm text-green-600 dark:text-green-400 mb-3">
+                          {localizedExperience.startDate}
+                          {localizedExperience.endDate && ` - ${localizedExperience.endDate}`}
+                          {experience.current && ` - ${t("experience.present")}`}
+                        </p>
+                        <p className="text-green-600 dark:text-green-400 text-sm leading-relaxed">
+                          {localizedExperience.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
