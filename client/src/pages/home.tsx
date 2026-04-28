@@ -7,6 +7,7 @@ import ExperienceSection from "@/components/experience-section";
 import BlogSection from "@/components/blog-section";
 import ContactSection from "@/components/contact-section";
 import Footer from "@/components/footer";
+import AdminFab from "@/components/admin-fab";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
         <ContactSection />
       </main>
       <Footer />
+      <AdminFab />
     </div>
   );
 }
