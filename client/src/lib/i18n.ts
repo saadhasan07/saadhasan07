@@ -19,6 +19,8 @@ export const translations = {
       liveDemo: "Live Demo",
       viewCode: "View Code",
       viewAll: "View All Projects",
+      featured: "Featured",
+      code: "Code",
     },
     experience: {
       title: "Experience & Education",
@@ -32,11 +34,13 @@ export const translations = {
     blog: {
       recentPosts: "Recent Posts",
       viewAll: "View all posts",
+      empty: "No blog posts available.",
     },
     talks: {
       title: "Talks & Presentations",
       viewSlides: "View Slides",
       watchVideo: "Watch Video",
+      empty: "No talks available.",
     },
     contact: {
       title: "Get In Touch",
@@ -62,14 +66,19 @@ export const translations = {
       trainingTitle: "Comprehensive Training Background",
       trainingDescription: "Completed intensive 1700+ hour Expert-level Cloud and Web Development program covering technical foundations, cloud computing, DevOps methodologies, containerization, infrastructure automation, and practical project implementation. Specialized training in AWS and Microsoft Azure with hands-on experience in modern development practices.",
       foundations: "600h Foundations",
-      development: "1100h Development", 
+      development: "1100h Development",
       devopsSpec: "600h DevOps Specialization",
     },
     timeline: {
       title: "Project Journey",
-      description: "Explore my development timeline and filter projects by year to see the evolution of my technical skills.",
+      description: "Browse the full project archive and filter by year to see how my portfolio has grown.",
       allYears: "All Years",
+      allProjects: "All Projects",
       projects: "Projects",
+    },
+    common: {
+      unableToLoadProfile: "Unable to load profile information.",
+      unableToLoadContact: "Unable to load contact information.",
     },
   },
   de: {
@@ -89,9 +98,11 @@ export const translations = {
     projects: {
       title: "Ausgewählte Projekte",
       description: "Eine Sammlung meiner neuesten Arbeiten, die Full-Stack-Entwicklung, API-Integration und moderne Webtechnologien zeigen.",
-      liveDemo: "Live Demo",
+      liveDemo: "Live-Demo",
       viewCode: "Code ansehen",
       viewAll: "Alle Projekte ansehen",
+      featured: "Empfohlen",
+      code: "Code",
     },
     experience: {
       title: "Erfahrung & Bildung",
@@ -105,11 +116,13 @@ export const translations = {
     blog: {
       recentPosts: "Neueste Beiträge",
       viewAll: "Alle Beiträge ansehen",
+      empty: "Keine Blogbeiträge verfügbar.",
     },
     talks: {
       title: "Vorträge & Präsentationen",
       viewSlides: "Folien ansehen",
       watchVideo: "Video ansehen",
+      empty: "Keine Vorträge verfügbar.",
     },
     contact: {
       title: "Kontakt aufnehmen",
@@ -139,10 +152,15 @@ export const translations = {
       devopsSpec: "600h DevOps Spezialisierung",
     },
     timeline: {
-      title: "Projekt-Reise",
-      description: "Erkunden Sie meine Entwicklungs-Timeline und filtern Sie Projekte nach Jahren, um die Evolution meiner technischen Fähigkeiten zu sehen.",
+      title: "Projektübersicht",
+      description: "Durchstöbern Sie das komplette Projektarchiv und filtern Sie nach Jahren, um die Entwicklung meines Portfolios zu sehen.",
       allYears: "Alle Jahre",
+      allProjects: "Alle Projekte",
       projects: "Projekte",
+    },
+    common: {
+      unableToLoadProfile: "Profilinformationen konnten nicht geladen werden.",
+      unableToLoadContact: "Kontaktinformationen konnten nicht geladen werden.",
     },
   },
 };
