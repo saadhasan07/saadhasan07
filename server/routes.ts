@@ -1,25 +1,66 @@
 import express, { type Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import path from "path";
-import fs from "fs";
 import { storage } from "./storage";
-import { insertProjectSchema, insertExperienceSchema, insertBlogPostSchema, insertTalkSchema } from "@shared/schema";
-import { syncGitHubProjects } from "./github";
-import { requireAdminAuth, adminLogin, adminLogout, checkAdminAuth } from "./auth-middleware";
+import {
+  insertProjectSchema,
+  insertExperienceSchema,
+  insertBlogPostSchema,
+  insertTalkSchema,
+} from "@shared/schema";
+import {
+  resolveGitHubUsername,
+  syncGitHubProjects,
+  syncGitHubProjectsIfNeeded,
+} from "./github";
+import {
+  requireAdminAuth,
+  adminLogin,
+  adminLogout,
+  checkAdminAuth,
+} from "./auth-middleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
-  // Admin authentication routes
+  const githubUsername = resolveGitHubUsername();
+
+  const tryAutoSyncProjects = async () => {
+    try {
+      await syncGitHubProjectsIfNeeded(githubUsername);
+    } catch (error) {
+      console.error("Background GitHub sync error:", error);
+    }
+  };
+
+  const handleGitHubSync = async (_req: Request, res: Response) => {
+    try {
+      const result = await syncGitHubProjects(githubUsername);
+      res.json({ message: "GitHub projects synced successfully", result });
+    } catch (error) {
+      console.error("GitHub sync error:", error);
+      res.status(500).json({
+        message: "Failed to sync GitHub projects",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  };
+
+  const handleProjectUpdate = async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const project = await storage.updateProject(id, req.body);
+      res.json(project);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update project" });
+    }
+  };
+
   app.post("/api/admin/login", adminLogin);
   app.post("/api/admin/logout", adminLogout);
   app.get("/api/admin/auth", checkAdminAuth);
 
-  // Apply admin auth middleware to admin routes
   app.use("/api/admin", requireAdminAuth);
   app.use("/admin", requireAdminAuth);
 
-  // Profile routes
-  app.get("/api/profile", async (req, res) => {
+  app.get("/api/profile", async (_req, res) => {
     try {
       const profile = await storage.getProfile();
       if (!profile) {
@@ -31,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/profile", async (req, res) => {
+  app.put("/api/profile", requireAdminAuth, async (req, res) => {
     try {
       const profile = await storage.updateProfile(req.body);
       res.json(profile);
@@ -40,9 +81,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Project routes
-  app.get("/api/projects", async (req, res) => {
+  app.get("/api/projects", async (_req, res) => {
     try {
+      await tryAutoSyncProjects();
       const projects = await storage.getAllProjects();
       res.json(projects);
     } catch (error) {
@@ -50,8 +91,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/projects/featured", async (req, res) => {
+  app.get("/api/projects/featured", async (_req, res) => {
     try {
+      await tryAutoSyncProjects();
       const projects = await storage.getFeaturedProjects();
       res.json(projects);
     } catch (error) {
@@ -72,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects", async (req, res) => {
+  app.post("/api/projects", requireAdminAuth, async (req, res) => {
     try {
       const validatedData = insertProjectSchema.parse(req.body);
       const project = await storage.createProject(validatedData);
@@ -82,17 +124,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/projects/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const project = await storage.updateProject(id, req.body);
-      res.json(project);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update project" });
-    }
-  });
+  app.put("/api/projects/:id", requireAdminAuth, handleProjectUpdate);
+  app.patch("/api/projects/:id", requireAdminAuth, handleProjectUpdate);
 
-  app.delete("/api/projects/:id", async (req, res) => {
+  app.delete("/api/projects/:id", requireAdminAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteProject(id);
@@ -105,8 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Experience routes
-  app.get("/api/experiences", async (req, res) => {
+  app.get("/api/experiences", async (_req, res) => {
     try {
       const experiences = await storage.getAllExperiences();
       res.json(experiences);
@@ -128,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/experiences", async (req, res) => {
+  app.post("/api/experiences", requireAdminAuth, async (req, res) => {
     try {
       const validatedData = insertExperienceSchema.parse(req.body);
       const experience = await storage.createExperience(validatedData);
@@ -138,7 +172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/experiences/:id", async (req, res) => {
+  app.put("/api/experiences/:id", requireAdminAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const experience = await storage.updateExperience(id, req.body);
@@ -148,7 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/experiences/:id", async (req, res) => {
+  app.delete("/api/experiences/:id", requireAdminAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteExperience(id);
@@ -161,19 +195,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GitHub sync route (protected)
-  app.post("/api/admin/sync-github", async (req, res) => {
-    try {
-      const result = await syncGitHubProjects("SaadHasan1");
-      res.json({ message: "GitHub projects synced successfully", result });
-    } catch (error) {
-      console.error("GitHub sync error:", error);
-      res.status(500).json({ message: "Failed to sync GitHub projects", error: error instanceof Error ? error.message : String(error) });
-    }
-  });
+  app.post("/api/admin/sync-github", handleGitHubSync);
 
-  // Blog routes
-  app.get("/api/blog", async (req, res) => {
+  app.get("/api/blog", async (_req, res) => {
     try {
       const posts = await storage.getAllBlogPosts();
       res.json(posts);
@@ -182,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/blog/featured", async (req, res) => {
+  app.get("/api/blog/featured", async (_req, res) => {
     try {
       const posts = await storage.getFeaturedBlogPosts();
       res.json(posts);
@@ -204,7 +228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/blog", async (req, res) => {
+  app.post("/api/blog", requireAdminAuth, async (req, res) => {
     try {
       const validatedData = insertBlogPostSchema.parse(req.body);
       const post = await storage.createBlogPost(validatedData);
@@ -214,7 +238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/blog/:id", async (req, res) => {
+  app.put("/api/blog/:id", requireAdminAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const post = await storage.updateBlogPost(id, req.body);
@@ -224,7 +248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/blog/:id", async (req, res) => {
+  app.delete("/api/blog/:id", requireAdminAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteBlogPost(id);
@@ -237,8 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Talks routes
-  app.get("/api/talks", async (req, res) => {
+  app.get("/api/talks", async (_req, res) => {
     try {
       const talks = await storage.getAllTalks();
       res.json(talks);
@@ -260,7 +283,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/talks", async (req, res) => {
+  app.post("/api/talks", requireAdminAuth, async (req, res) => {
     try {
       const validatedData = insertTalkSchema.parse(req.body);
       const talk = await storage.createTalk(validatedData);
@@ -270,7 +293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/talks/:id", async (req, res) => {
+  app.put("/api/talks/:id", requireAdminAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const talk = await storage.updateTalk(id, req.body);
@@ -280,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/talks/:id", async (req, res) => {
+  app.delete("/api/talks/:id", requireAdminAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteTalk(id);
@@ -293,8 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Translation routes
-  app.get("/api/translations", async (req, res) => {
+  app.get("/api/translations", async (_req, res) => {
     try {
       const translations = await storage.getAllTranslations();
       res.json(translations);
@@ -316,7 +338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/translations/:key", async (req: Request, res: Response) => {
+  app.put("/api/translations/:key", requireAdminAuth, async (req: Request, res: Response) => {
     try {
       const key = req.params.key;
       const translation = await storage.updateTranslation(key, req.body);
@@ -333,7 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });
       }
-      const cvUrl = language === 'de' ? profile.cvGerman : profile.cvEnglish;
+      const cvUrl = language === "de" ? profile.cvGerman : profile.cvEnglish;
       if (!cvUrl) {
         return res.status(404).json({ message: "CV not found for this language" });
       }
@@ -343,18 +365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
-
-  // GitHub sync route
-  app.post("/api/sync-github", async (req, res) => {
-    try {
-      await syncGitHubProjects("saadhasan07");
-      res.json({ message: "GitHub projects synced successfully" });
-    } catch (error) {
-      console.error("GitHub sync error:", error);
-      res.status(500).json({ message: "Failed to sync GitHub projects", error: error instanceof Error ? error.message : String(error) });
-    }
-  });
+  app.post("/api/sync-github", requireAdminAuth, handleGitHubSync);
 
   const httpServer = createServer(app);
   return httpServer;
