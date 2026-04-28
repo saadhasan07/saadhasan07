@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { translations } from "@/lib/i18n";
 
 type Language = "en" | "de";
@@ -22,29 +22,50 @@ const initialState: LanguageProviderState = {
 
 const LanguageProviderContext = createContext<LanguageProviderState>(initialState);
 
+function isLanguage(value: string | null): value is Language {
+  return value === "en" || value === "de";
+}
+
 export function LanguageProvider({
   children,
   defaultLanguage = "en",
   ...props
 }: LanguageProviderProps) {
-  const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem("language") as Language;
-    return saved || defaultLanguage;
-  });
+  const [language, setLanguageState] = useState<Language>(defaultLanguage);
+
+  useEffect(() => {
+    try {
+      const savedLanguage = window.localStorage.getItem("language");
+      if (isLanguage(savedLanguage) && savedLanguage !== language) {
+        setLanguageState(savedLanguage);
+      }
+    } catch {
+      // Ignore storage access errors and keep the default language.
+    }
+  }, [language]);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+
+    try {
+      window.localStorage.setItem("language", language);
+    } catch {
+      // Ignore storage access errors.
+    }
+  }, [language]);
 
   const setLanguage = (newLanguage: Language) => {
     setLanguageState(newLanguage);
-    localStorage.setItem("language", newLanguage);
   };
 
   const t = (key: string): string => {
     const keys = key.split(".");
     let value: any = translations[language];
-    
+
     for (const k of keys) {
       value = value?.[k];
     }
-    
+
     return value || key;
   };
 
