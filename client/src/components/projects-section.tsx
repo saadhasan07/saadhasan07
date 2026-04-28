@@ -31,13 +31,20 @@ export default function ProjectsSection() {
       project,
       position: {
         x: rect.right,
-        y: rect.top
-      }
+        y: rect.top,
+      },
     });
   };
 
   const handleMouseLeave = () => {
     setTooltip(null);
+  };
+
+  const scrollToProjectJourney = () => {
+    const element = document.getElementById("project-journey");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   if (isLoading) {
@@ -53,20 +60,20 @@ export default function ProjectsSection() {
               <Card key={i} className="overflow-hidden relative">
                 <div className="w-full h-48 skeleton-card skeleton-wave relative overflow-hidden"></div>
                 <CardContent className="p-6">
-                  <div className="h-6 skeleton rounded mb-3" style={{animationDelay: `${i * 0.1}s`}}></div>
+                  <div className="h-6 skeleton rounded mb-3" style={{ animationDelay: `${i * 0.1}s` }}></div>
                   <div className="space-y-2 mb-4">
-                    <div className="h-4 skeleton rounded" style={{animationDelay: `${i * 0.1 + 0.1}s`}}></div>
-                    <div className="h-4 skeleton rounded w-4/5" style={{animationDelay: `${i * 0.1 + 0.2}s`}}></div>
-                    <div className="h-4 skeleton rounded w-3/5" style={{animationDelay: `${i * 0.1 + 0.3}s`}}></div>
+                    <div className="h-4 skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.1}s` }}></div>
+                    <div className="h-4 skeleton rounded w-4/5" style={{ animationDelay: `${i * 0.1 + 0.2}s` }}></div>
+                    <div className="h-4 skeleton rounded w-3/5" style={{ animationDelay: `${i * 0.1 + 0.3}s` }}></div>
                   </div>
                   <div className="flex gap-2 mb-4">
-                    <div className="h-6 w-16 skeleton rounded-full" style={{animationDelay: `${i * 0.1 + 0.4}s`}}></div>
-                    <div className="h-6 w-20 skeleton rounded-full" style={{animationDelay: `${i * 0.1 + 0.5}s`}}></div>
-                    <div className="h-6 w-14 skeleton rounded-full" style={{animationDelay: `${i * 0.1 + 0.6}s`}}></div>
+                    <div className="h-6 w-16 skeleton rounded-full" style={{ animationDelay: `${i * 0.1 + 0.4}s` }}></div>
+                    <div className="h-6 w-20 skeleton rounded-full" style={{ animationDelay: `${i * 0.1 + 0.5}s` }}></div>
+                    <div className="h-6 w-14 skeleton rounded-full" style={{ animationDelay: `${i * 0.1 + 0.6}s` }}></div>
                   </div>
                   <div className="flex gap-3">
-                    <div className="h-10 flex-1 skeleton rounded" style={{animationDelay: `${i * 0.1 + 0.7}s`}}></div>
-                    <div className="h-10 flex-1 skeleton rounded" style={{animationDelay: `${i * 0.1 + 0.8}s`}}></div>
+                    <div className="h-10 flex-1 skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.7}s` }}></div>
+                    <div className="h-10 flex-1 skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.8}s` }}></div>
                   </div>
                 </CardContent>
               </Card>
@@ -91,8 +98,8 @@ export default function ProjectsSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project) => (
-            <Card 
-              key={project.id} 
+            <Card
+              key={project.id}
               className="overflow-hidden card-hover group cursor-pointer"
               onMouseEnter={(e) => handleMouseEnter(project, e)}
               onMouseLeave={handleMouseLeave}
@@ -130,12 +137,12 @@ export default function ProjectsSection() {
                 </div>
 
                 <p className="text-green-600 dark:text-green-400 mb-4 text-sm leading-relaxed">
-                  {language === 'de' && (project as any).descriptionDe ? (project as any).descriptionDe : project.description}
+                  {language === "de" && (project as any).descriptionDe ? (project as any).descriptionDe : project.description}
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {project.technologies.map((tech, index) => (
-                    <Badge key={tech} variant="secondary" className="text-xs badge transition-all duration-300 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" style={{animationDelay: `${index * 0.1}s`}}>
+                    <Badge key={tech} variant="secondary" className="text-xs badge transition-all duration-300 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" style={{ animationDelay: `${index * 0.1}s` }}>
                       {tech}
                     </Badge>
                   ))}
@@ -172,16 +179,18 @@ export default function ProjectsSection() {
           ))}
         </div>
 
-        {/* View All Projects Button */}
         <div className="text-center mt-12">
-          <Button variant="ghost" className="group text-green-700 dark:text-green-400 hover:text-green-600 dark:hover:text-green-300">
+          <Button
+            variant="ghost"
+            className="group text-green-700 dark:text-green-400 hover:text-green-600 dark:hover:text-green-300"
+            onClick={scrollToProjectJourney}
+          >
             {t("projects.viewAll")}
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
 
-      {/* Project Tooltip */}
       <ProjectTooltip
         project={tooltip?.project as Project}
         isVisible={!!tooltip}
