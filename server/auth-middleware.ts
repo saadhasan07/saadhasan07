@@ -1,31 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 
-// Extend the session interface to include admin authentication
 declare module 'express-session' {
   interface SessionData {
     adminAuthenticated?: boolean;
   }
 }
 
-export const requireAdminAuth = (req: Request, res: Response, next: NextFunction) => {
-  // Check if this is a login attempt
-  if (req.path === '/api/admin/login' && req.method === 'POST') {
-    return next();
-  }
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
-  // Check if admin is authenticated
+export const requireAdminAuth = (req: Request, res: Response, next: NextFunction) => {
   if (req.session.adminAuthenticated) {
     return next();
   }
 
-  // Return 401 for API routes
-  if (req.path.startsWith('/api/admin')) {
+  if (req.originalUrl.startsWith('/api/admin')) {
     return res.status(401).json({ message: 'Admin authentication required' });
   }
 
-  // For non-API admin routes, redirect to login
-  if (req.path.startsWith('/admin')) {
+  if (req.originalUrl.startsWith('/admin')) {
     return res.redirect('/admin/login');
   }
 
@@ -35,8 +29,7 @@ export const requireAdminAuth = (req: Request, res: Response, next: NextFunction
 export const adminLogin = (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  // Simple authentication - in production, use proper hashing
-  if (username === 'admin' && password === 'admin') {
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     req.session.adminAuthenticated = true;
     res.json({ success: true, message: 'Authentication successful' });
   } else {
