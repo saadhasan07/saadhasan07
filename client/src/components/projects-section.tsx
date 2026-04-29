@@ -7,7 +7,7 @@ import { useProjects } from "@/hooks/useStaticData";
 import { getProjectPreviewImage } from "@/lib/project-preview";
 import type { Project } from "@shared/schema";
 import ProjectTooltip from "@/components/project-tooltip";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 export default function ProjectsSection() {
   const { t, language } = useLanguage();
@@ -15,7 +15,6 @@ export default function ProjectsSection() {
     project: Project;
     position: { x: number; y: number };
   } | null>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   const { data: projects = [], isLoading } = useProjects();
 
@@ -65,9 +64,9 @@ export default function ProjectsSection() {
                     <div className="h-6 w-20 skeleton rounded-full" style={{ animationDelay: `${i * 0.1 + 0.5}s` }}></div>
                     <div className="h-6 w-14 skeleton rounded-full" style={{ animationDelay: `${i * 0.1 + 0.6}s` }}></div>
                   </div>
-                  <div className="flex gap-3">
-                    <div className="h-10 flex-1 skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.7}s` }}></div>
-                    <div className="h-10 flex-1 skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.8}s` }}></div>
+                  <div className="flex flex-col gap-3">
+                    <div className="h-10 w-full skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.7}s` }}></div>
+                    <div className="h-10 w-full skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.8}s` }}></div>
                   </div>
                 </CardContent>
               </Card>
@@ -142,27 +141,27 @@ export default function ProjectsSection() {
                   ))}
                 </div>
 
-                <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <div className="mt-auto flex flex-col gap-3">
                   {project.demoUrl && (
-                    <Button asChild size="sm" className="w-full sm:flex-1 text-xs prominent-button min-w-0 whitespace-normal text-center justify-center px-4">
+                    <Button asChild size="sm" className="project-card-button prominent-button">
                       <a
                         href={project.demoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <ExternalLink className="w-3 h-3 mr-1 shrink-0 transition-transform group-hover:scale-110" />
+                        <ExternalLink className="w-3 h-3 shrink-0 transition-transform group-hover:scale-110" />
                         {t("projects.liveDemo")}
                       </a>
                     </Button>
                   )}
                   {project.githubUrl && (
-                    <Button asChild variant="secondary" size="sm" className="w-full sm:flex-1 text-xs secondary-button min-w-0 whitespace-normal text-center justify-center px-4">
+                    <Button asChild variant="secondary" size="sm" className="project-card-button secondary-button">
                       <a
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Github className="w-3 h-3 mr-1 shrink-0 transition-transform group-hover:scale-110" />
+                        <Github className="w-3 h-3 shrink-0 transition-transform group-hover:scale-110" />
                         {t("projects.viewCode")}
                       </a>
                     </Button>
