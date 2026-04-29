@@ -53,7 +53,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/95 shadow-sm backdrop-blur-md transition-colors duration-300">
+    <nav className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background shadow-sm transition-colors duration-300 supports-[backdrop-filter]:bg-background/98 supports-[backdrop-filter]:backdrop-blur-md">
       <div className="container-width">
         <div className="flex min-h-16 items-center justify-between gap-4 py-2">
           <div className="flex-shrink-0">
