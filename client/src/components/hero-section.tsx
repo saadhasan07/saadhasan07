@@ -79,14 +79,14 @@ export default function HeroSection() {
   const localizedProfile = getLocalizedProfile(profile, language);
 
   return (
-    <section id="about" className="relative min-h-screen flex items-center overflow-hidden">
+    <section id="about" className="relative flex min-h-[calc(100vh-5rem)] items-center overflow-hidden pt-24 pb-12 md:pt-28 lg:pt-32">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url(${zenBackground})`,
         }}
       ></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent dark:from-black/60 dark:via-black/40 dark:to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/20 dark:from-black/70 dark:via-black/50 dark:to-black/20"></div>
 
       <div className="container-width relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -143,7 +143,7 @@ export default function HeroSection() {
           </div>
 
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end fade-in">
-            <div className="relative mt-32 lg:mt-40">
+            <div className="relative mt-6 md:mt-8 lg:mt-0">
               <img
                 src={avatarImage}
                 alt={`${profile.name} - Professional Profile Photo`}
