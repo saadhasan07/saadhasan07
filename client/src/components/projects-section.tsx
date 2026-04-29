@@ -123,7 +123,7 @@ export default function ProjectsSection() {
                 )}
               </div>
 
-              <CardContent className="p-6">
+              <CardContent className="flex h-full flex-col p-6">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xl font-bold text-green-800 dark:text-green-400 group-hover:text-green-600 dark:group-hover:text-green-300 transition-colors">
                     {project.title}
@@ -142,27 +142,27 @@ export default function ProjectsSection() {
                   ))}
                 </div>
 
-                <div className="flex space-x-3">
+                <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   {project.demoUrl && (
-                    <Button asChild size="sm" className="flex-1 text-xs prominent-button">
+                    <Button asChild size="sm" className="w-full sm:flex-1 text-xs prominent-button min-w-0 whitespace-normal text-center justify-center px-4">
                       <a
                         href={project.demoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <ExternalLink className="w-3 h-3 mr-1 transition-transform group-hover:scale-110" />
+                        <ExternalLink className="w-3 h-3 mr-1 shrink-0 transition-transform group-hover:scale-110" />
                         {t("projects.liveDemo")}
                       </a>
                     </Button>
                   )}
                   {project.githubUrl && (
-                    <Button asChild variant="secondary" size="sm" className="flex-1 text-xs secondary-button">
+                    <Button asChild variant="secondary" size="sm" className="w-full sm:flex-1 text-xs secondary-button min-w-0 whitespace-normal text-center justify-center px-4">
                       <a
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Github className="w-3 h-3 mr-1 transition-transform group-hover:scale-110" />
+                        <Github className="w-3 h-3 mr-1 shrink-0 transition-transform group-hover:scale-110" />
                         {t("projects.viewCode")}
                       </a>
                     </Button>
