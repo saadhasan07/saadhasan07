@@ -100,7 +100,7 @@ export default function ProjectTimeline() {
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 />
               </div>
-              <CardContent className="p-6">
+              <CardContent className="flex h-full flex-col p-6">
                 <div className="flex items-start justify-between mb-3 gap-3">
                   <h3 className="text-xl font-semibold text-foreground mb-2">
                     {project.title}
@@ -122,18 +122,18 @@ export default function ProjectTimeline() {
                     </Badge>
                   ))}
                 </div>
-                <div className="flex gap-2">
+                <div className="mt-auto flex flex-col gap-3">
                   {project.githubUrl && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <Button size="sm" variant="outline" asChild className="project-card-button secondary-button">
+                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
                         <Github size={16} />
                         {t("projects.code")}
                       </a>
                     </Button>
                   )}
                   {project.demoUrl && (
-                    <Button size="sm" asChild>
-                      <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <Button size="sm" asChild className="project-card-button prominent-button">
+                      <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">
                         <ExternalLink size={16} />
                         {t("projects.liveDemo")}
                       </a>
