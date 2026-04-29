@@ -159,6 +159,9 @@ export default function AdminPage() {
                 <p className="text-sm text-muted-foreground">
                   Sync your latest GitHub repositories to automatically update your projects section.
                 </p>
+                <p className="text-sm text-muted-foreground">
+                  This sync reads your public GitHub repositories directly. It does not open a separate GitHub login window.
+                </p>
                 <div className="flex gap-4">
                   <Button
                     onClick={handleGitHubSync}
