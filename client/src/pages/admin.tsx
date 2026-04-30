@@ -20,6 +20,13 @@ type GitHubConnection = {
   hasToken: boolean;
 };
 
+type GitHubSyncMode = "all" | "portfolio-only";
+
+type GitHubConnectionsResponse = {
+  accounts: GitHubConnection[];
+  syncMode: GitHubSyncMode;
+};
+
 export default function AdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -42,7 +49,7 @@ export default function AdminPage() {
     enabled: isAuthenticated,
   });
 
-  const { data: githubConnections } = useQuery<{ accounts: GitHubConnection[] }>({
+  const { data: githubConnections } = useQuery<GitHubConnectionsResponse>({
     queryKey: ["/api/admin/github-connections"],
     enabled: isAuthenticated,
   });
@@ -61,22 +68,22 @@ export default function AdminPage() {
     },
   });
 
-  const saveGitHubAccountsMutation = useMutation({
-    mutationFn: async (accounts: string[]) => {
-      const response = await apiRequest("PUT", "/api/admin/github-connections", { accounts });
+  const saveGitHubSettingsMutation = useMutation({
+    mutationFn: async ({ accounts, syncMode }: { accounts: string[]; syncMode: GitHubSyncMode }) => {
+      const response = await apiRequest("PUT", "/api/admin/github-connections", { accounts, syncMode });
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/github-connections"] });
       toast({
-        title: "GitHub Accounts Updated",
-        description: "Your portfolio GitHub account list has been saved.",
+        title: "GitHub Settings Updated",
+        description: "Your portfolio GitHub accounts and sync mode have been saved.",
       });
     },
     onError: (error) => {
       toast({
         title: "Update Failed",
-        description: error instanceof Error ? error.message : "Could not save the GitHub account list.",
+        description: error instanceof Error ? error.message : "Could not save the GitHub settings.",
         variant: "destructive",
       });
     },
@@ -114,6 +121,7 @@ export default function AdminPage() {
   };
 
   const currentAccounts = githubConnections?.accounts?.map((account) => account.username) || [];
+  const currentSyncMode = githubConnections?.syncMode || "all";
 
   const handleAddGitHubAccount = async () => {
     const normalized = newGitHubAccount.trim().replace(/^@/, "");
@@ -129,12 +137,25 @@ export default function AdminPage() {
       return;
     }
 
-    await saveGitHubAccountsMutation.mutateAsync([...currentAccounts, normalized]);
+    await saveGitHubSettingsMutation.mutateAsync({
+      accounts: [...currentAccounts, normalized],
+      syncMode: currentSyncMode,
+    });
     setNewGitHubAccount("");
   };
 
   const handleRemoveGitHubAccount = async (username: string) => {
-    await saveGitHubAccountsMutation.mutateAsync(currentAccounts.filter((account) => account !== username));
+    await saveGitHubSettingsMutation.mutateAsync({
+      accounts: currentAccounts.filter((account) => account !== username),
+      syncMode: currentSyncMode,
+    });
+  };
+
+  const handleSyncModeChange = async (syncMode: GitHubSyncMode) => {
+    await saveGitHubSettingsMutation.mutateAsync({
+      accounts: currentAccounts,
+      syncMode,
+    });
   };
 
   if (isLoading) {
@@ -247,7 +268,7 @@ export default function AdminPage() {
                           size="sm"
                           className="mt-3 text-red-500 hover:text-red-400"
                           onClick={() => handleRemoveGitHubAccount(account.username)}
-                          disabled={saveGitHubAccountsMutation.isPending}
+                          disabled={saveGitHubSettingsMutation.isPending}
                         >
                           Remove
                         </Button>
@@ -265,7 +286,7 @@ export default function AdminPage() {
                       type="button"
                       onClick={handleAddGitHubAccount}
                       className="prominent-button"
-                      disabled={saveGitHubAccountsMutation.isPending}
+                      disabled={saveGitHubSettingsMutation.isPending}
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Add Account
@@ -275,6 +296,42 @@ export default function AdminPage() {
                   <p className="text-xs text-muted-foreground">
                     This list controls which GitHub accounts your portfolio sync uses. If you remove every saved account, it falls back to the default setup.
                   </p>
+                </div>
+
+                <div className="space-y-4 rounded-lg border border-border bg-muted/20 p-4">
+                  <div className="space-y-1">
+                    <h4 className="font-medium text-foreground">Project Sync Mode</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Keep the current behavior or switch to a more selective portfolio-focused sync. You can change it back anytime.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button
+                      type="button"
+                      variant={currentSyncMode === "all" ? "default" : "outline"}
+                      className={currentSyncMode === "all" ? "prominent-button" : ""}
+                      disabled={saveGitHubSettingsMutation.isPending}
+                      onClick={() => handleSyncModeChange("all")}
+                    >
+                      Show All Good Repos
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={currentSyncMode === "portfolio-only" ? "default" : "outline"}
+                      className={currentSyncMode === "portfolio-only" ? "prominent-button" : ""}
+                      disabled={saveGitHubSettingsMutation.isPending}
+                      onClick={() => handleSyncModeChange("portfolio-only")}
+                    >
+                      Portfolio-Focused Only
+                    </Button>
+                  </div>
+
+                  <div className="rounded-lg bg-background/80 p-3 text-sm text-muted-foreground">
+                    {currentSyncMode === "all"
+                      ? "Current mode: your portfolio keeps showing all strong public repos, just like it does now."
+                      : "Current mode: your portfolio prefers repos that look portfolio-ready, including featured repos and repos tagged for portfolio use."}
+                  </div>
                 </div>
 
                 <div className="space-y-2">
