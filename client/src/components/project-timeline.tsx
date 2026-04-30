@@ -90,9 +90,9 @@ export default function ProjectTimeline() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {filteredProjects.map((project) => (
-            <Card key={project.id} className="hover:shadow-lg transition-all duration-300 border border-border/20 bg-card/50 backdrop-blur-sm">
+            <Card key={project.id} className="flex h-full flex-col border border-border/20 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg">
               <div className="relative h-48 overflow-hidden rounded-t-lg">
                 <img
                   src={getProjectPreviewImage(project)}
@@ -100,29 +100,29 @@ export default function ProjectTimeline() {
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 />
               </div>
-              <CardContent className="flex h-full flex-col p-6">
-                <div className="flex items-start justify-between mb-3 gap-3">
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+              <CardContent className="flex flex-1 flex-col p-6">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <h3 className="mb-2 text-xl font-semibold text-foreground">
                     {project.title}
                   </h3>
                   {project.featured && (
-                    <Badge variant="default" className="bg-primary text-primary-foreground shrink-0">
+                    <Badge variant="default" className="shrink-0 bg-primary text-primary-foreground">
                       <Star size={12} className="mr-1" />
                       {t("projects.featured")}
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
                   {language === "de" && (project as any).descriptionDe ? (project as any).descriptionDe : project.description}
                 </p>
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="mb-4 flex flex-wrap gap-2">
                   {project.technologies?.map((tech: string) => (
                     <Badge key={tech} variant="secondary" className="text-xs">
                       {tech}
                     </Badge>
                   ))}
                 </div>
-                <div className="mt-auto flex flex-col gap-3">
+                <div className="mt-auto flex flex-col gap-3 pt-2">
                   {project.githubUrl && (
                     <Button size="sm" variant="outline" asChild className="project-card-button secondary-button">
                       <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
