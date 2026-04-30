@@ -14,6 +14,12 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { apiRequest } from "@/lib/api";
 import type { Project, BlogPost, Talk, InsertProject, InsertBlogPost, InsertTalk } from "@shared/schema";
 
+type GitHubConnection = {
+  username: string;
+  source: "single" | "multi" | "default";
+  hasToken: boolean;
+};
+
 export default function AdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -32,6 +38,11 @@ export default function AdminPage() {
 
   const { data: talks = [] } = useQuery<Talk[]>({
     queryKey: ["/api/talks"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: githubConnections } = useQuery<{ accounts: GitHubConnection[] }>({
+    queryKey: ["/api/admin/github-connections"],
     enabled: isAuthenticated,
   });
 
@@ -155,13 +166,47 @@ export default function AdminPage() {
                   GitHub Integration
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Sync your latest GitHub repositories to automatically update your projects section.
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  This sync reads your public GitHub repositories directly. It does not open a separate GitHub login window.
-                </p>
+              <CardContent className="space-y-6">
+                <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-4">
+                  <h4 className="font-medium text-foreground">Connected GitHub Accounts</h4>
+                  <p className="text-sm text-muted-foreground">
+                    These are the GitHub accounts your portfolio is currently reading from.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {githubConnections?.accounts?.map((account) => (
+                      <div key={account.username} className="rounded-lg border border-border bg-background px-4 py-3 min-w-[220px]">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="font-semibold text-foreground">@{account.username}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {account.source === "multi"
+                                ? "Configured from the multi-account list"
+                                : account.source === "single"
+                                  ? "Configured as the main GitHub account"
+                                  : "Using the default GitHub account"}
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {account.hasToken ? "Token ready" : "Public sync only"}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Adding or removing accounts later will be done from server settings. This screen now shows clearly which account is active.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Sync your latest GitHub repositories to automatically update your projects section.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    This sync reads your public GitHub repositories directly. It does not open a separate GitHub login window.
+                  </p>
+                </div>
+
                 <div className="flex gap-4">
                   <Button
                     onClick={handleGitHubSync}
@@ -181,12 +226,13 @@ export default function AdminPage() {
                     )}
                   </Button>
                 </div>
-                <div className="mt-4 p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+
+                <div className="rounded-lg bg-green-50 dark:bg-green-950/20 p-4">
                   <h4 className="font-medium text-green-800 dark:text-green-400 mb-2">
                     How GitHub Sync Works:
                   </h4>
                   <ul className="text-sm text-green-600 dark:text-green-300 space-y-1">
-                    <li>• Fetches your public repositories from GitHub</li>
+                    <li>• Fetches your public repositories from the connected account list</li>
                     <li>• Automatically creates project entries for new repositories</li>
                     <li>• Updates existing projects with latest information</li>
                     <li>• Brings in homepage links and repo preview images when available</li>
