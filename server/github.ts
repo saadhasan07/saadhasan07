@@ -23,10 +23,15 @@ export interface GitHubConnectionStatus {
   hasToken: boolean;
 }
 
+export type GitHubSyncMode = "all" | "portfolio-only";
+
 const DEFAULT_GITHUB_USERNAME = "saadhasan07";
 const GITHUB_ACCOUNTS_CONFIG_KEY = "config.github.accounts";
+const GITHUB_SYNC_MODE_CONFIG_KEY = "config.github.syncMode";
+const DEFAULT_GITHUB_SYNC_MODE: GitHubSyncMode = "all";
 const AUTO_SYNC_INTERVAL_MS = 1000 * 60 * 30;
 const HIDDEN_TOPICS = new Set(["hidden", "draft", "hide-from-portfolio"]);
+const PORTFOLIO_TOPICS = new Set(["portfolio", "featured", "portfolio-featured"]);
 let lastGitHubSyncAt = 0;
 
 export function resolveGitHubUsername() {
@@ -78,6 +83,10 @@ function parseStoredGitHubAccounts(rawValue: string | null | undefined) {
   return [];
 }
 
+function normalizeGitHubSyncMode(rawValue: string | null | undefined): GitHubSyncMode {
+  return rawValue === "portfolio-only" ? "portfolio-only" : DEFAULT_GITHUB_SYNC_MODE;
+}
+
 export async function getManagedGitHubUsernames() {
   const configured = await storage.getTranslation(GITHUB_ACCOUNTS_CONFIG_KEY);
   const storedAccounts = parseStoredGitHubAccounts(configured?.en || configured?.de || "");
@@ -118,6 +127,22 @@ export async function setManagedGitHubUsernames(usernames: string[]) {
   });
   lastGitHubSyncAt = 0;
   return getManagedGitHubUsernames();
+}
+
+export async function getGitHubSyncMode() {
+  const configured = await storage.getTranslation(GITHUB_SYNC_MODE_CONFIG_KEY);
+  return normalizeGitHubSyncMode(configured?.en || configured?.de || "");
+}
+
+export async function setGitHubSyncMode(mode: string) {
+  const normalized = normalizeGitHubSyncMode(mode);
+  await storage.updateTranslation(GITHUB_SYNC_MODE_CONFIG_KEY, {
+    key: GITHUB_SYNC_MODE_CONFIG_KEY,
+    en: normalized,
+    de: normalized,
+  });
+  lastGitHubSyncAt = 0;
+  return normalized;
 }
 
 export async function getGitHubConnectionStatus(): Promise<GitHubConnectionStatus[]> {
@@ -165,12 +190,26 @@ export async function fetchGitHubRepositories(username: string = resolveGitHubUs
   }
 }
 
+function shouldIncludeRepoInSync(repo: GitHubRepo, mode: GitHubSyncMode) {
+  if (mode === "all") {
+    return true;
+  }
+
+  const normalizedTopics = repo.topics.map((topic) => topic.toLowerCase());
+  if (normalizedTopics.some((topic) => PORTFOLIO_TOPICS.has(topic))) {
+    return true;
+  }
+
+  return shouldBeFeatured(repo);
+}
+
 export async function syncGitHubProjects(usernames?: string[]) {
   try {
     const managed = usernames && usernames.length > 0 ? { usernames, source: "stored" as const } : await getManagedGitHubUsernames();
+    const syncMode = await getGitHubSyncMode();
     const uniqueUsernames = Array.from(new Set(managed.usernames.filter(Boolean)));
     const repoGroups = await Promise.all(uniqueUsernames.map((username) => fetchGitHubRepositories(username)));
-    const repos = repoGroups.flat();
+    const repos = repoGroups.flat().filter((repo) => shouldIncludeRepoInSync(repo, syncMode));
     const existingProjects = await storage.getAllProjects();
     const existingByRepoKey = new Map(
       existingProjects
