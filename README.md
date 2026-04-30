@@ -1,106 +1,75 @@
-# Saad Hasan - Portfolio Website
+# Saad Hasan Portfolio
 
-A modern, multilingual academic portfolio website showcasing DevOps expertise, projects, and professional experience.
+A dynamic personal portfolio for showcasing projects, experience, writing, and multilingual profile content.
 
-## 🌟 Features
+## Live Site
 
-- **Multilingual Support**: English and German language options
-- **Dark/Light Theme**: Toggle between themes for optimal viewing
-- **Admin Dashboard**: Secure content management system
-- **GitHub Integration**: Automatic project synchronization
-- **Responsive Design**: Optimized for all devices
-- **CV Downloads**: Professional CV available in multiple formats
+- Portfolio: [https://saadhasan.de](https://saadhasan.de)
+- Render deployment: [https://saadhasan07.onrender.com](https://saadhasan07.onrender.com)
+- Admin: available from the footer `Admin` button after login
 
-## 🛠️ Technology Stack
+## What This Project Does
 
-- **Frontend**: React, TypeScript, Tailwind CSS
-- **Backend**: Node.js, Express
-- **Database**: PostgreSQL with Drizzle ORM
-- **Authentication**: Session-based admin authentication
-- **Deployment**: Replit with automatic deployment
+- Serves a bilingual portfolio in English and German
+- Includes light and dark theme support
+- Lets portfolio content be managed through an admin dashboard
+- Syncs GitHub repositories into the projects section
+- Supports multiple GitHub accounts for project sync
+- Lets you switch GitHub sync behavior between broader and portfolio-focused modes
+- Exposes downloadable CV files and project/demo links
 
-## 🚀 Live Demo
+## Stack
 
-- **Portfolio**: [Live Website](https://saadhasan07.replit.app)
-- **Admin Panel**: Access via footer link (secure login required)
+- Frontend: React, TypeScript, Tailwind CSS, TanStack Query
+- Backend: Node.js, Express
+- Data layer: Drizzle ORM with PostgreSQL support plus in-memory fallback for free hosting
+- Authentication: session-based admin login
+- Hosting: Render with custom domain managed through IONOS DNS
 
-## 📋 Project Sections
+## Project Structure
 
-- **About**: Professional introduction and skills
-- **Projects**: Featured development projects with GitHub sync
-- **Experience**: Career timeline and achievements
-- **Blog**: Technical articles and insights
-- **Talks**: Speaking engagements and presentations
-- **Contact**: Professional contact information
+- `client/`: React app and UI components
+- `server/`: Express app, admin routes, GitHub sync, auth, and storage
+- `shared/`: shared schema and types
+- `attached_assets/`: profile media and downloadable CV assets
 
-## 🔧 Admin Features
+## GitHub Sync
 
-- Project management with GitHub repository sync
-- Blog post creation and editing
-- Talk/presentation management
-- Real-time content updates
-- Secure authentication system
+The portfolio can pull repositories from one or more GitHub usernames.
 
-## 🎨 Design Philosophy
+Admin features include:
+- viewing connected GitHub accounts
+- adding or removing GitHub usernames
+- running manual sync
+- choosing between `Show All Good Repos` and `Portfolio-Focused Only`
 
-Clean, professional design with:
-- Zen garden green color scheme
-- Smooth animations and transitions
-- Accessibility-focused navigation
-- Professional typography (Inter & Playfair Display)
+Hidden or draft-style repositories can be excluded with topics like:
+- `hidden`
+- `draft`
+- `hide-from-portfolio`
 
-## 📱 Responsive Design
-
-Optimized for:
-- Desktop computers
-- Tablets
-- Mobile devices
-- High-resolution displays
-
-## 🔒 Security
-
-- Session-based authentication
-- Protected admin routes
-- Secure API endpoints
-- Environment variable management
-
-## 🌍 Internationalization
-
-- English and German language support
-- Dynamic content translation
-- Localized UI components
-- Cultural adaptation
-
-## 📄 CV Downloads
-
-Professional CV available in:
-- PDF format (English/German)
-- DOCX format (English/German)
-- Optimized for ATS systems
-
-## 🏗️ Development
+## Local Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
-
-# Database operations
-npm run db:push
-
-# Build for production
-npm run build
 ```
 
-## 📧 Contact
+Useful scripts:
 
-**Saad Hasan**
-- Email: [Professional Email]
-- GitHub: [SaadHasan1](https://github.com/SaadHasan1)
-- LinkedIn: [Professional Profile]
+```bash
+npm run build
+npm run start
+npm run check
+npm run db:push
+```
 
----
+## Notes
 
-*Built with modern web technologies for optimal performance and user experience.*
+- The project is intentionally dynamic and not a static export.
+- The production domain is `saadhasan.de`.
+- The free Render deployment may take a few seconds to wake up after inactivity.
+
+## Cleanup Done
+
+This repo has been cleaned up to remove duplicate server packaging files and stale hosting references so the main app structure is easier to maintain.
