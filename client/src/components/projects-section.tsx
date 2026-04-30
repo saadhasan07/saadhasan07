@@ -50,9 +50,9 @@ export default function ProjectsSection() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="overflow-hidden relative">
-                <div className="w-full h-48 skeleton-card skeleton-wave relative overflow-hidden"></div>
-                <CardContent className="p-6">
+              <Card key={i} className="relative flex h-full flex-col overflow-hidden">
+                <div className="relative h-48 w-full overflow-hidden skeleton-card skeleton-wave"></div>
+                <CardContent className="flex flex-1 flex-col p-6">
                   <div className="h-6 skeleton rounded mb-3" style={{ animationDelay: `${i * 0.1}s` }}></div>
                   <div className="space-y-2 mb-4">
                     <div className="h-4 skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.1}s` }}></div>
@@ -64,7 +64,7 @@ export default function ProjectsSection() {
                     <div className="h-6 w-20 skeleton rounded-full" style={{ animationDelay: `${i * 0.1 + 0.5}s` }}></div>
                     <div className="h-6 w-14 skeleton rounded-full" style={{ animationDelay: `${i * 0.1 + 0.6}s` }}></div>
                   </div>
-                  <div className="flex flex-col gap-3">
+                  <div className="mt-auto flex flex-col gap-3">
                     <div className="h-10 w-full skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.7}s` }}></div>
                     <div className="h-10 w-full skeleton rounded" style={{ animationDelay: `${i * 0.1 + 0.8}s` }}></div>
                   </div>
@@ -89,19 +89,19 @@ export default function ProjectsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {projects.map((project) => (
             <Card
               key={project.id}
-              className="overflow-hidden card-hover group cursor-pointer"
+              className="card-hover group flex h-full flex-col overflow-hidden cursor-pointer"
               onMouseEnter={(e) => handleMouseEnter(project, e)}
               onMouseLeave={handleMouseLeave}
             >
-              <div className="relative">
+              <div className="relative h-48 overflow-hidden">
                 <img
                   src={getProjectPreviewImage(project)}
                   alt={project.title}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 {project.githubUrl && (
                   <Button
@@ -122,8 +122,8 @@ export default function ProjectsSection() {
                 )}
               </div>
 
-              <CardContent className="flex h-full flex-col p-6">
-                <div className="flex items-center justify-between mb-3">
+              <CardContent className="flex flex-1 flex-col p-6">
+                <div className="flex items-center justify-between mb-3 gap-3">
                   <h3 className="text-xl font-bold text-green-800 dark:text-green-400 group-hover:text-green-600 dark:group-hover:text-green-300 transition-colors">
                     {project.title}
                   </h3>
@@ -141,7 +141,7 @@ export default function ProjectsSection() {
                   ))}
                 </div>
 
-                <div className="mt-auto flex flex-col gap-3">
+                <div className="mt-auto flex flex-col gap-3 pt-2">
                   {project.demoUrl && (
                     <Button asChild size="sm" className="project-card-button prominent-button">
                       <a
