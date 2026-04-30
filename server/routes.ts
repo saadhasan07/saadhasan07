@@ -8,7 +8,8 @@ import {
   insertTalkSchema,
 } from "@shared/schema";
 import {
-  resolveGitHubUsername,
+  getGitHubConnectionStatus,
+  resolveGitHubUsernames,
   syncGitHubProjects,
   syncGitHubProjectsIfNeeded,
 } from "./github";
@@ -20,11 +21,11 @@ import {
 } from "./auth-middleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const githubUsername = resolveGitHubUsername();
+  const githubUsernames = resolveGitHubUsernames();
 
   const tryAutoSyncProjects = async () => {
     try {
-      await syncGitHubProjectsIfNeeded(githubUsername);
+      await syncGitHubProjectsIfNeeded(githubUsernames);
     } catch (error) {
       console.error("Background GitHub sync error:", error);
     }
@@ -32,7 +33,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const handleGitHubSync = async (_req: Request, res: Response) => {
     try {
-      const result = await syncGitHubProjects(githubUsername);
+      const result = await syncGitHubProjects(githubUsernames);
       res.json({ message: "GitHub projects synced successfully", result });
     } catch (error) {
       console.error("GitHub sync error:", error);
@@ -192,6 +193,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(500).json({ message: "Failed to delete experience" });
     }
+  });
+
+  app.get("/api/admin/github-connections", (_req, res) => {
+    res.json({ accounts: getGitHubConnectionStatus() });
   });
 
   app.post("/api/admin/sync-github", handleGitHubSync);
