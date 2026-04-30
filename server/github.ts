@@ -17,13 +17,52 @@ interface GitHubRepo {
   open_graph_image_url?: string | null;
 }
 
+export interface GitHubConnectionStatus {
+  username: string;
+  source: "single" | "multi" | "default";
+  hasToken: boolean;
+}
+
 const DEFAULT_GITHUB_USERNAME = "saadhasan07";
 const AUTO_SYNC_INTERVAL_MS = 1000 * 60 * 30;
 const HIDDEN_TOPICS = new Set(["hidden", "draft", "hide-from-portfolio"]);
 let lastGitHubSyncAt = 0;
 
 export function resolveGitHubUsername() {
-  return process.env.GITHUB_USERNAME || DEFAULT_GITHUB_USERNAME;
+  return resolveGitHubUsernames()[0] || DEFAULT_GITHUB_USERNAME;
+}
+
+export function resolveGitHubUsernames() {
+  const configuredList = process.env.GITHUB_USERNAMES
+    ?.split(",")
+    .map((username) => username.trim())
+    .filter(Boolean);
+
+  if (configuredList && configuredList.length > 0) {
+    return Array.from(new Set(configuredList));
+  }
+
+  const singleUsername = process.env.GITHUB_USERNAME?.trim();
+  if (singleUsername) {
+    return [singleUsername];
+  }
+
+  return [DEFAULT_GITHUB_USERNAME];
+}
+
+export function getGitHubConnectionStatus(): GitHubConnectionStatus[] {
+  const usernames = resolveGitHubUsernames();
+  const source: GitHubConnectionStatus["source"] = process.env.GITHUB_USERNAMES
+    ? "multi"
+    : process.env.GITHUB_USERNAME
+      ? "single"
+      : "default";
+
+  return usernames.map((username) => ({
+    username,
+    source,
+    hasToken: Boolean(process.env.GITHUB_TOKEN),
+  }));
 }
 
 export async function fetchGitHubRepositories(username: string = resolveGitHubUsername()): Promise<GitHubRepo[]> {
@@ -44,7 +83,7 @@ export async function fetchGitHubRepositories(username: string = resolveGitHubUs
 
     if (!response.ok) {
       const message = await response.text();
-      throw new Error(`GitHub API error: ${response.status} ${message || response.statusText}`);
+      throw new Error(`GitHub API error for ${username}: ${response.status} ${message || response.statusText}`);
     }
 
     const repos: GitHubRepo[] = await response.json();
@@ -61,9 +100,11 @@ export async function fetchGitHubRepositories(username: string = resolveGitHubUs
   }
 }
 
-export async function syncGitHubProjects(username: string = resolveGitHubUsername()) {
+export async function syncGitHubProjects(usernames: string[] = resolveGitHubUsernames()) {
   try {
-    const repos = await fetchGitHubRepositories(username);
+    const uniqueUsernames = Array.from(new Set(usernames.filter(Boolean)));
+    const repoGroups = await Promise.all(uniqueUsernames.map((username) => fetchGitHubRepositories(username)));
+    const repos = repoGroups.flat();
     const existingProjects = await storage.getAllProjects();
     const existingByRepoKey = new Map(
       existingProjects
@@ -127,12 +168,12 @@ export async function syncGitHubProjects(username: string = resolveGitHubUsernam
   }
 }
 
-export async function syncGitHubProjectsIfNeeded(username: string = resolveGitHubUsername()) {
+export async function syncGitHubProjectsIfNeeded(usernames: string[] = resolveGitHubUsernames()) {
   if (Date.now() - lastGitHubSyncAt < AUTO_SYNC_INTERVAL_MS) {
     return false;
   }
 
-  await syncGitHubProjects(username);
+  await syncGitHubProjects(usernames);
   return true;
 }
 
