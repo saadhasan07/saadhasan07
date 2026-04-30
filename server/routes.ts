@@ -9,7 +9,9 @@ import {
 } from "@shared/schema";
 import {
   getGitHubConnectionStatus,
+  getGitHubSyncMode,
   getManagedGitHubUsernames,
+  setGitHubSyncMode,
   setManagedGitHubUsernames,
   syncGitHubProjects,
   syncGitHubProjectsIfNeeded,
@@ -197,17 +199,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/admin/github-connections", async (_req, res) => {
-    res.json({ accounts: await getGitHubConnectionStatus() });
+    res.json({
+      accounts: await getGitHubConnectionStatus(),
+      syncMode: await getGitHubSyncMode(),
+    });
   });
 
   app.put("/api/admin/github-connections", async (req, res) => {
     try {
       const accounts = Array.isArray(req.body?.accounts) ? req.body.accounts : [];
-      const updated = await setManagedGitHubUsernames(accounts.map(String));
-      res.json({ accounts: updated.usernames, source: updated.source });
+      const updatedAccounts = await setManagedGitHubUsernames(accounts.map(String));
+      const syncMode = typeof req.body?.syncMode === "string"
+        ? await setGitHubSyncMode(req.body.syncMode)
+        : await getGitHubSyncMode();
+
+      res.json({
+        accounts: updatedAccounts.usernames,
+        source: updatedAccounts.source,
+        syncMode,
+      });
     } catch (error) {
       res.status(500).json({
-        message: "Failed to update GitHub accounts",
+        message: "Failed to update GitHub settings",
         error: error instanceof Error ? error.message : String(error),
       });
     }
