@@ -16,7 +16,7 @@ import type { Project, BlogPost, Talk, InsertProject, InsertBlogPost, InsertTalk
 
 type GitHubConnection = {
   username: string;
-  source: "single" | "multi" | "default";
+  source: "stored" | "single" | "multi" | "default";
   hasToken: boolean;
 };
 
@@ -24,6 +24,7 @@ export default function AdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isGitHubSyncing, setIsGitHubSyncing] = useState(false);
+  const [newGitHubAccount, setNewGitHubAccount] = useState("");
   const { isAuthenticated, isLoading } = useAdminAuth();
 
   const { data: projects = [] } = useQuery<Project[]>({
@@ -60,6 +61,27 @@ export default function AdminPage() {
     },
   });
 
+  const saveGitHubAccountsMutation = useMutation({
+    mutationFn: async (accounts: string[]) => {
+      const response = await apiRequest("PUT", "/api/admin/github-connections", { accounts });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/github-connections"] });
+      toast({
+        title: "GitHub Accounts Updated",
+        description: "Your portfolio GitHub account list has been saved.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update Failed",
+        description: error instanceof Error ? error.message : "Could not save the GitHub account list.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const syncGitHubMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("POST", "/api/admin/sync-github");
@@ -89,6 +111,30 @@ export default function AdminPage() {
     } finally {
       setIsGitHubSyncing(false);
     }
+  };
+
+  const currentAccounts = githubConnections?.accounts?.map((account) => account.username) || [];
+
+  const handleAddGitHubAccount = async () => {
+    const normalized = newGitHubAccount.trim().replace(/^@/, "");
+    if (!normalized) {
+      return;
+    }
+
+    if (currentAccounts.includes(normalized)) {
+      toast({
+        title: "Already Added",
+        description: `@${normalized} is already in your GitHub account list.`,
+      });
+      return;
+    }
+
+    await saveGitHubAccountsMutation.mutateAsync([...currentAccounts, normalized]);
+    setNewGitHubAccount("");
+  };
+
+  const handleRemoveGitHubAccount = async (username: string) => {
+    await saveGitHubAccountsMutation.mutateAsync(currentAccounts.filter((account) => account !== username));
   };
 
   if (isLoading) {
@@ -167,34 +213,67 @@ export default function AdminPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-4">
-                  <h4 className="font-medium text-foreground">Connected GitHub Accounts</h4>
-                  <p className="text-sm text-muted-foreground">
-                    These are the GitHub accounts your portfolio is currently reading from.
-                  </p>
+                <div className="space-y-4 rounded-lg border border-border bg-muted/20 p-4">
+                  <div className="space-y-1">
+                    <h4 className="font-medium text-foreground">Connected GitHub Accounts</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Add or remove the GitHub accounts your portfolio should read projects from.
+                    </p>
+                  </div>
+
                   <div className="flex flex-wrap gap-3">
                     {githubConnections?.accounts?.map((account) => (
-                      <div key={account.username} className="rounded-lg border border-border bg-background px-4 py-3 min-w-[220px]">
+                      <div key={account.username} className="min-w-[220px] rounded-lg border border-border bg-background px-4 py-3">
                         <div className="flex items-center justify-between gap-3">
                           <div>
                             <p className="font-semibold text-foreground">@{account.username}</p>
                             <p className="text-xs text-muted-foreground">
-                              {account.source === "multi"
-                                ? "Configured from the multi-account list"
-                                : account.source === "single"
-                                  ? "Configured as the main GitHub account"
-                                  : "Using the default GitHub account"}
+                              {account.source === "stored"
+                                ? "Saved from your admin settings"
+                                : account.source === "multi"
+                                  ? "Configured from the multi-account list"
+                                  : account.source === "single"
+                                    ? "Configured as the main GitHub account"
+                                    : "Using the default GitHub account"}
                             </p>
                           </div>
                           <Badge variant="outline" className="text-xs">
                             {account.hasToken ? "Token ready" : "Public sync only"}
                           </Badge>
                         </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="mt-3 text-red-500 hover:text-red-400"
+                          onClick={() => handleRemoveGitHubAccount(account.username)}
+                          disabled={saveGitHubAccountsMutation.isPending}
+                        >
+                          Remove
+                        </Button>
                       </div>
                     ))}
                   </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Input
+                      value={newGitHubAccount}
+                      onChange={(event) => setNewGitHubAccount(event.target.value)}
+                      placeholder="Add GitHub username"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAddGitHubAccount}
+                      className="prominent-button"
+                      disabled={saveGitHubAccountsMutation.isPending}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Account
+                    </Button>
+                  </div>
+
                   <p className="text-xs text-muted-foreground">
-                    Adding or removing accounts later will be done from server settings. This screen now shows clearly which account is active.
+                    This list controls which GitHub accounts your portfolio sync uses. If you remove every saved account, it falls back to the default setup.
                   </p>
                 </div>
 
@@ -203,7 +282,7 @@ export default function AdminPage() {
                     Sync your latest GitHub repositories to automatically update your projects section.
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    This sync reads your public GitHub repositories directly. It does not open a separate GitHub login window.
+                    This sync reads public GitHub repositories directly. It does not open a separate GitHub login window.
                   </p>
                 </div>
 
