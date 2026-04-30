@@ -90,14 +90,14 @@ export default function ProjectTimeline() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2 lg:grid-cols-3">
           {filteredProjects.map((project) => (
             <Card key={project.id} className="flex h-full flex-col border border-border/20 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg">
               <div className="relative h-48 overflow-hidden rounded-t-lg">
                 <img
                   src={getProjectPreviewImage(project)}
                   alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                 />
               </div>
               <CardContent className="flex flex-1 flex-col p-6">
@@ -112,7 +112,7 @@ export default function ProjectTimeline() {
                     </Badge>
                   )}
                 </div>
-                <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+                <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                   {language === "de" && (project as any).descriptionDe ? (project as any).descriptionDe : project.description}
                 </p>
                 <div className="mb-4 flex flex-wrap gap-2">
@@ -122,7 +122,7 @@ export default function ProjectTimeline() {
                     </Badge>
                   ))}
                 </div>
-                <div className="mt-auto flex flex-col gap-3 pt-2">
+                <div className="flex flex-col gap-3 pt-2">
                   {project.githubUrl && (
                     <Button size="sm" variant="outline" asChild className="project-card-button secondary-button">
                       <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
