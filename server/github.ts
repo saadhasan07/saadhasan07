@@ -19,11 +19,12 @@ interface GitHubRepo {
 
 export interface GitHubConnectionStatus {
   username: string;
-  source: "single" | "multi" | "default";
+  source: "stored" | "single" | "multi" | "default";
   hasToken: boolean;
 }
 
 const DEFAULT_GITHUB_USERNAME = "saadhasan07";
+const GITHUB_ACCOUNTS_CONFIG_KEY = "config.github.accounts";
 const AUTO_SYNC_INTERVAL_MS = 1000 * 60 * 30;
 const HIDDEN_TOPICS = new Set(["hidden", "draft", "hide-from-portfolio"]);
 let lastGitHubSyncAt = 0;
@@ -50,17 +51,81 @@ export function resolveGitHubUsernames() {
   return [DEFAULT_GITHUB_USERNAME];
 }
 
-export function getGitHubConnectionStatus(): GitHubConnectionStatus[] {
-  const usernames = resolveGitHubUsernames();
-  const source: GitHubConnectionStatus["source"] = process.env.GITHUB_USERNAMES
-    ? "multi"
-    : process.env.GITHUB_USERNAME
-      ? "single"
-      : "default";
+function normalizeGitHubUsernames(usernames: string[]) {
+  return Array.from(
+    new Set(
+      usernames
+        .map((username) => username.trim().replace(/^@/, ""))
+        .filter(Boolean),
+    ),
+  );
+}
 
-  return usernames.map((username) => ({
+function parseStoredGitHubAccounts(rawValue: string | null | undefined) {
+  if (!rawValue) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue);
+    if (Array.isArray(parsed)) {
+      return normalizeGitHubUsernames(parsed.map(String));
+    }
+  } catch {
+    return normalizeGitHubUsernames(rawValue.split(","));
+  }
+
+  return [];
+}
+
+export async function getManagedGitHubUsernames() {
+  const configured = await storage.getTranslation(GITHUB_ACCOUNTS_CONFIG_KEY);
+  const storedAccounts = parseStoredGitHubAccounts(configured?.en || configured?.de || "");
+
+  if (storedAccounts.length > 0) {
+    return {
+      usernames: storedAccounts,
+      source: "stored" as const,
+    };
+  }
+
+  if (process.env.GITHUB_USERNAMES) {
+    return {
+      usernames: resolveGitHubUsernames(),
+      source: "multi" as const,
+    };
+  }
+
+  if (process.env.GITHUB_USERNAME) {
+    return {
+      usernames: resolveGitHubUsernames(),
+      source: "single" as const,
+    };
+  }
+
+  return {
+    usernames: [DEFAULT_GITHUB_USERNAME],
+    source: "default" as const,
+  };
+}
+
+export async function setManagedGitHubUsernames(usernames: string[]) {
+  const normalized = normalizeGitHubUsernames(usernames);
+  await storage.updateTranslation(GITHUB_ACCOUNTS_CONFIG_KEY, {
+    key: GITHUB_ACCOUNTS_CONFIG_KEY,
+    en: JSON.stringify(normalized),
+    de: JSON.stringify(normalized),
+  });
+  lastGitHubSyncAt = 0;
+  return getManagedGitHubUsernames();
+}
+
+export async function getGitHubConnectionStatus(): Promise<GitHubConnectionStatus[]> {
+  const managed = await getManagedGitHubUsernames();
+
+  return managed.usernames.map((username) => ({
     username,
-    source,
+    source: managed.source,
     hasToken: Boolean(process.env.GITHUB_TOKEN),
   }));
 }
@@ -100,9 +165,10 @@ export async function fetchGitHubRepositories(username: string = resolveGitHubUs
   }
 }
 
-export async function syncGitHubProjects(usernames: string[] = resolveGitHubUsernames()) {
+export async function syncGitHubProjects(usernames?: string[]) {
   try {
-    const uniqueUsernames = Array.from(new Set(usernames.filter(Boolean)));
+    const managed = usernames && usernames.length > 0 ? { usernames, source: "stored" as const } : await getManagedGitHubUsernames();
+    const uniqueUsernames = Array.from(new Set(managed.usernames.filter(Boolean)));
     const repoGroups = await Promise.all(uniqueUsernames.map((username) => fetchGitHubRepositories(username)));
     const repos = repoGroups.flat();
     const existingProjects = await storage.getAllProjects();
@@ -168,7 +234,7 @@ export async function syncGitHubProjects(usernames: string[] = resolveGitHubUser
   }
 }
 
-export async function syncGitHubProjectsIfNeeded(usernames: string[] = resolveGitHubUsernames()) {
+export async function syncGitHubProjectsIfNeeded(usernames?: string[]) {
   if (Date.now() - lastGitHubSyncAt < AUTO_SYNC_INTERVAL_MS) {
     return false;
   }
