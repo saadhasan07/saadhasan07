@@ -9,7 +9,8 @@ import {
 } from "@shared/schema";
 import {
   getGitHubConnectionStatus,
-  resolveGitHubUsernames,
+  getManagedGitHubUsernames,
+  setManagedGitHubUsernames,
   syncGitHubProjects,
   syncGitHubProjectsIfNeeded,
 } from "./github";
@@ -21,11 +22,10 @@ import {
 } from "./auth-middleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const githubUsernames = resolveGitHubUsernames();
-
   const tryAutoSyncProjects = async () => {
     try {
-      await syncGitHubProjectsIfNeeded(githubUsernames);
+      const managed = await getManagedGitHubUsernames();
+      await syncGitHubProjectsIfNeeded(managed.usernames);
     } catch (error) {
       console.error("Background GitHub sync error:", error);
     }
@@ -33,7 +33,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const handleGitHubSync = async (_req: Request, res: Response) => {
     try {
-      const result = await syncGitHubProjects(githubUsernames);
+      const managed = await getManagedGitHubUsernames();
+      const result = await syncGitHubProjects(managed.usernames);
       res.json({ message: "GitHub projects synced successfully", result });
     } catch (error) {
       console.error("GitHub sync error:", error);
@@ -195,8 +196,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/github-connections", (_req, res) => {
-    res.json({ accounts: getGitHubConnectionStatus() });
+  app.get("/api/admin/github-connections", async (_req, res) => {
+    res.json({ accounts: await getGitHubConnectionStatus() });
+  });
+
+  app.put("/api/admin/github-connections", async (req, res) => {
+    try {
+      const accounts = Array.isArray(req.body?.accounts) ? req.body.accounts : [];
+      const updated = await setManagedGitHubUsernames(accounts.map(String));
+      res.json({ accounts: updated.usernames, source: updated.source });
+    } catch (error) {
+      res.status(500).json({
+        message: "Failed to update GitHub accounts",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   });
 
   app.post("/api/admin/sync-github", handleGitHubSync);
