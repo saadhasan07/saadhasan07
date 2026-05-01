@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Edit, Trash2, Github, RefreshCw, LogOut } from "lucide-react";
+import { AlertTriangle, Plus, Edit, Trash2, Github, RefreshCw, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { apiRequest } from "@/lib/api";
@@ -32,7 +32,7 @@ export default function AdminPage() {
   const queryClient = useQueryClient();
   const [isGitHubSyncing, setIsGitHubSyncing] = useState(false);
   const [newGitHubAccount, setNewGitHubAccount] = useState("");
-  const { isAuthenticated, isLoading } = useAdminAuth();
+  const { isAuthenticated, isLoading, authData } = useAdminAuth();
 
   const { data: projects = [] } = useQuery<Project[]>({
     queryKey: ["/api/projects"],
@@ -204,6 +204,26 @@ export default function AdminPage() {
             </Button>
           </div>
         </div>
+
+        {authData?.usingDefaultCredentials && (
+          <Card className="mb-6 border-amber-400/40 bg-amber-50 dark:bg-amber-950/20">
+            <CardContent className="flex items-start gap-3 p-4">
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-700 dark:text-amber-300" />
+              <div>
+                <p className="font-medium text-amber-800 dark:text-amber-200">
+                  Default admin credentials are still active
+                </p>
+                <p className="text-sm text-amber-700 dark:text-amber-300">
+                  The dashboard is still using the temporary fallback login. It is safer to set
+                  <span className="font-mono"> ADMIN_USERNAME </span>
+                  and
+                  <span className="font-mono"> ADMIN_PASSWORD </span>
+                  in your hosting settings when you are ready.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Tabs defaultValue="projects" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
