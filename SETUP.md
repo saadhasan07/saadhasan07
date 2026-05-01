@@ -19,6 +19,7 @@ npm run dev
 ## Important Environment Variables
 
 - `SESSION_SECRET`: required for admin login sessions
+- `ADMIN_USERNAME` and `ADMIN_PASSWORD`: recommended for a safer admin login than the temporary default fallback
 - `DATABASE_URL`: enables PostgreSQL-backed storage
 - `USE_MEM_STORAGE=true`: lets the app run without a database for free-hosting or quick previews
 - `GITHUB_TOKEN`: improves GitHub sync reliability and rate limits
@@ -34,3 +35,4 @@ npm run dev
 
 - GitHub accounts and sync mode can be managed from the admin dashboard.
 - Sync mode can be switched back anytime if you prefer the broader repo list.
+- If you leave `ADMIN_USERNAME` and `ADMIN_PASSWORD` empty, the app falls back to `admin` / `admin` so you can still get in, but that should only be temporary.
